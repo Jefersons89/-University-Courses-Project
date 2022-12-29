@@ -3,11 +3,9 @@ package com.springframework.universitycourses.services;
 import java.util.Set;
 
 
-public interface CrudService<T, K, S>
+public interface CrudService<T, K>
 {
 	T findById(K id);
-
-	T findByTitle(S title);
 
 	Set<T> findAll();
 
