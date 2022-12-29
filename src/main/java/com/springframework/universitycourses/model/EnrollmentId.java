@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 
@@ -17,7 +18,10 @@ public class EnrollmentId implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
+	@NotNull(message = "Id is mandatory")
 	private Long studentId;
+
+	@NotNull(message = "Id is mandatory")
 	private Long assignmentId;
 
 	@Builder

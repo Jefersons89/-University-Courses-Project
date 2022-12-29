@@ -20,7 +20,7 @@ import java.io.Serializable;
 @MappedSuperclass
 public class BaseEntity implements Serializable
 {
-	@NotNull(message = "Code is mandatory")
+	@NotNull(message = "id is mandatory")
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
