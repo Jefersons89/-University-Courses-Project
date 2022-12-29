@@ -9,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -21,17 +20,8 @@ import java.io.Serializable;
 @MappedSuperclass
 public class BaseEntity implements Serializable
 {
-	@NotNull
+	@NotNull(message = "Code is mandatory")
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	@NotNull(message = "Name is mandatory")
-	private Long code;
-
-	@NotBlank(message = "Name is mandatory")
-	private String title;
-
-	@NotBlank(message = "Name is mandatory")
-	private String description;
 }

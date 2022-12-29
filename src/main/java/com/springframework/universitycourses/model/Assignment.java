@@ -22,7 +22,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @Entity
 @Table(name = "assignments")
-public class Assignment extends BaseEntity
+public class Assignment extends LearningMaterial
 {
 	@NotNull
 	@Max(30)
@@ -34,10 +34,17 @@ public class Assignment extends BaseEntity
 	@JoinColumn(name = "course_id")
 	private Course course;
 
+	@ManyToOne
+	@JoinColumn(name = "teacher_id")
+	private Teacher teacher;
+
 	@Builder
-	public Assignment(final Long id, final Long code, final String title, final String description, final Long points)
+	public Assignment(final Long id, final String title, final String description, final Long points, final Course course,
+			final Teacher teacher)
 	{
-		super(id, code, title, description);
+		super(id, title, description);
 		this.points = points;
+		this.course = course;
+		this.teacher = teacher;
 	}
 }

@@ -22,7 +22,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "courses")
-public class Course extends BaseEntity
+public class Course extends LearningMaterial
 {
 	@NotNull
 	@Max(150)
@@ -34,10 +34,10 @@ public class Course extends BaseEntity
 	private Set<Assignment> assignments = new HashSet<>();
 
 	@Builder
-	public Course(final Long id, final Long code, final String title, final String description, final Long credit,
+	public Course(final Long id, final String title, final String description, final Long credit,
 			final Set<Assignment> assignments)
 	{
-		super(id, code, title, description);
+		super(id, title, description);
 		this.credit = credit;
 		this.assignments = assignments;
 	}
