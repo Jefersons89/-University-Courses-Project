@@ -26,12 +26,6 @@ public class CourseSDJpaService implements CourseService
 	}
 
 	@Override
-	public Course findByTitle(final String title)
-	{
-		return getCourseRepository().findByTitle(title);
-	}
-
-	@Override
 	public Set<Course> findAll()
 	{
 		Set<Course> courses = new HashSet<>();

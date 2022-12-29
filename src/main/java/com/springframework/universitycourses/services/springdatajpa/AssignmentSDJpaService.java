@@ -26,12 +26,6 @@ public class AssignmentSDJpaService implements AssignmentService
 	}
 
 	@Override
-	public Assignment findByTitle(final String title)
-	{
-		return getAssignmentRepository().findByTitle(title);
-	}
-
-	@Override
 	public Set<Assignment> findAll()
 	{
 		Set<Assignment> assignments = new HashSet<>();

@@ -23,9 +23,10 @@ public class Teacher extends User
 	private Set<Assignment> assignments = new HashSet<>();
 
 	@Builder
-	public Teacher(final Long id, final String firstName, final String lastName, final Set<Assignment> assignments)
+	public Teacher(final Long id, final String firstName, final String lastName, final String email,
+			final Set<Assignment> assignments)
 	{
-		super(id, firstName, lastName);
+		super(id, firstName, lastName, email);
 		this.assignments = assignments;
 	}
 }

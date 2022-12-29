@@ -4,6 +4,6 @@ import com.springframework.universitycourses.model.Teacher;
 import org.springframework.data.repository.CrudRepository;
 
 
-public interface TeacherService extends CrudRepository<Teacher, Long>
+public interface TeacherRepository extends CrudRepository<Teacher, Long>
 {
 }
