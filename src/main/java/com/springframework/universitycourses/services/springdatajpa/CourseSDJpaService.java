@@ -28,15 +28,13 @@ public class CourseSDJpaService implements CourseService
 	@Override
 	public Set<Course> findAll()
 	{
-		Set<Course> courses = new HashSet<>();
-		getCourseRepository().findAll().forEach(courses::add);
-		return courses;
+		return new HashSet<>(getCourseRepository().findAll());
 	}
 
 	@Override
 	public Course save(final Course object)
 	{
-		return getCourseRepository().save(object);
+		return getCourseRepository().saveAndFlush(object);
 	}
 
 	@Override

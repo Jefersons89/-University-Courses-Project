@@ -1,10 +1,9 @@
 package com.springframework.universitycourses.repositories;
 
 import com.springframework.universitycourses.model.Course;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 
-public interface CourseRepository extends CrudRepository<Course, Long>
+public interface CourseRepository extends JpaRepository<Course, Long>
 {
-	Course findByTitle(String title);
 }

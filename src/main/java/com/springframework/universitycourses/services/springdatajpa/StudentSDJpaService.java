@@ -3,11 +3,13 @@ package com.springframework.universitycourses.services.springdatajpa;
 import com.springframework.universitycourses.model.Student;
 import com.springframework.universitycourses.repositories.StudentRepository;
 import com.springframework.universitycourses.services.StudentService;
+import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
 
 
+@Service
 public class StudentSDJpaService implements StudentService
 {
 	private final StudentRepository studentRepository;
@@ -26,15 +28,13 @@ public class StudentSDJpaService implements StudentService
 	@Override
 	public Set<Student> findAll()
 	{
-		Set<Student> students = new HashSet<>();
-		getStudentRepository().findAll().forEach(students::add);
-		return students;
+		return new HashSet<>(getStudentRepository().findAll());
 	}
 
 	@Override
 	public Student save(final Student object)
 	{
-		return getStudentRepository().save(object);
+		return getStudentRepository().saveAndFlush(object);
 	}
 
 	@Override

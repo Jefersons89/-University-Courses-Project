@@ -4,11 +4,13 @@ import com.springframework.universitycourses.model.Enrollment;
 import com.springframework.universitycourses.model.EnrollmentId;
 import com.springframework.universitycourses.repositories.EnrollmentRepository;
 import com.springframework.universitycourses.services.EnrollmentService;
+import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
 
 
+@Service
 public class EnrollmentSDJpaService implements EnrollmentService
 {
 	private final EnrollmentRepository enrollmentRepository;
@@ -27,15 +29,13 @@ public class EnrollmentSDJpaService implements EnrollmentService
 	@Override
 	public Set<Enrollment> findAll()
 	{
-		Set<Enrollment> enrollments = new HashSet<>();
-		getEnrollmentRepository().findAll().forEach(enrollments::add);
-		return enrollments;
+		return new HashSet<>(getEnrollmentRepository().findAll());
 	}
 
 	@Override
 	public Enrollment save(final Enrollment object)
 	{
-		return getEnrollmentRepository().save(object);
+		return getEnrollmentRepository().saveAndFlush(object);
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import com.springframework.universitycourses.services.AssignmentService;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -28,15 +29,13 @@ public class AssignmentSDJpaService implements AssignmentService
 	@Override
 	public Set<Assignment> findAll()
 	{
-		Set<Assignment> assignments = new HashSet<>();
-		getAssignmentRepository().findAll().forEach(assignments::add);
-		return assignments;
+		return new HashSet<>(getAssignmentRepository().findAll());
 	}
 
 	@Override
 	public Assignment save(final Assignment object)
 	{
-		return getAssignmentRepository().save(object);
+		return getAssignmentRepository().saveAndFlush(object);
 	}
 
 	@Override

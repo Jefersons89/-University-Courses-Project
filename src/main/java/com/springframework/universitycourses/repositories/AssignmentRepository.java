@@ -1,10 +1,9 @@
 package com.springframework.universitycourses.repositories;
 
 import com.springframework.universitycourses.model.Assignment;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 
-public interface AssignmentRepository extends CrudRepository<Assignment, Long>
+public interface AssignmentRepository extends JpaRepository<Assignment, Long>
 {
-	Assignment findByTitle(String title);
 }

@@ -16,7 +16,7 @@ import javax.validation.constraints.NotBlank;
 @MappedSuperclass
 public class LearningMaterial extends BaseEntity
 {
-	@NotBlank(message = "Name is mandatory")
+	@NotBlank(message = "Title is mandatory")
 	private String title;
 
 	@NotBlank(message = "Description is mandatory")

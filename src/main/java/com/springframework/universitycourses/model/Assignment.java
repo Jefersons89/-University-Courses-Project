@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -33,24 +34,26 @@ public class Assignment extends LearningMaterial
 	@Column
 	private Long points;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "course_id")
 	private Course course;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "teacher_id")
 	private Teacher teacher;
 
-	@OneToMany(mappedBy = "assignment")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "assignment")
 	private transient Set<Enrollment> enrollments = new HashSet<>();
 
 	@Builder
 	public Assignment(final Long id, final String title, final String description, final Long points, final Course course,
-			final Teacher teacher)
+			final Teacher teacher,
+			final Set<Enrollment> enrollments)
 	{
 		super(id, title, description);
 		this.points = points;
 		this.course = course;
 		this.teacher = teacher;
+		this.enrollments = enrollments;
 	}
 }
