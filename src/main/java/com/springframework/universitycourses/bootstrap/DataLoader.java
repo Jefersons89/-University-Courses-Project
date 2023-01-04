@@ -27,11 +27,8 @@ public class DataLoader implements CommandLineRunner
 	private static final Logger LOGGER = Logger.getLogger(DataLoader.class.getName());
 	private final CourseService courseService;
 	private final AssignmentService assignmentService;
-
 	private final TeacherService teacherService;
-
 	private final StudentService studentService;
-
 	private final EnrollmentService enrollmentService;
 
 	public DataLoader(final CourseService courseService, final AssignmentService assignmentService,
@@ -261,6 +258,8 @@ public class DataLoader implements CommandLineRunner
 						.grade(0L)
 						.inProgress(true)
 						.build();
+
+		programing.getEnrollments().add(enrollment4);
 
 		getAssignmentService().save(dataBases);
 		getAssignmentService().save(machineLearning);

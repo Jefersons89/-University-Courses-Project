@@ -9,7 +9,11 @@ public interface CrudService<T, K>
 
 	Set<T> findAll();
 
+	T createNew(T object);
+
 	T save(T object);
+
+	T update(K id, T object);
 
 	void delete(T object);
 

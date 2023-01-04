@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
 import java.util.Set;
 
 
@@ -13,12 +12,7 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentDTO
+public class EnrollmentListDTO
 {
-	private Long id;
-	private String firstName;
-	private String lastName;
-	private String email;
-	private Date enrollmentYear;
-	private Set<EnrollmentDTO> enrollments;
+	Set<EnrollmentDTO> enrollmentDTOSet;
 }

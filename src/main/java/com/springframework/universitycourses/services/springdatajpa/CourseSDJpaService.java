@@ -1,46 +1,69 @@
 package com.springframework.universitycourses.services.springdatajpa;
 
-import com.springframework.universitycourses.model.Course;
+import com.springframework.universitycourses.api.v1.mapper.CourseMapper;
+import com.springframework.universitycourses.api.v1.model.CourseDTO;
 import com.springframework.universitycourses.repositories.CourseRepository;
 import com.springframework.universitycourses.services.CourseService;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
 public class CourseSDJpaService implements CourseService
 {
 	private final CourseRepository courseRepository;
+	private final CourseMapper courseMapper;
 
-	public CourseSDJpaService(final CourseRepository courseRepository)
+	public CourseSDJpaService(final CourseRepository courseRepository, final CourseMapper courseMapper)
 	{
 		this.courseRepository = courseRepository;
+		this.courseMapper = courseMapper;
 	}
 
 	@Override
-	public Course findById(final Long id)
+	public CourseDTO findById(final Long id)
 	{
-		return getCourseRepository().findById(id).orElse(null);
+		return getCourseRepository().findById(id)
+				.map(getCourseMapper()::courseToCourseDTO)
+				.orElse(null);
 	}
 
 	@Override
-	public Set<Course> findAll()
+	public Set<CourseDTO> findAll()
 	{
-		return new HashSet<>(getCourseRepository().findAll());
+		return getCourseRepository().findAll()
+				.stream()
+				.map(getCourseMapper()::courseToCourseDTO)
+				.collect(Collectors.toSet());
 	}
 
 	@Override
-	public Course save(final Course object)
+	public CourseDTO createNew(final CourseDTO object)
 	{
-		return getCourseRepository().saveAndFlush(object);
+		return this.save(object);
 	}
 
 	@Override
-	public void delete(final Course object)
+	public CourseDTO save(final CourseDTO object)
 	{
-		getCourseRepository().delete(object);
+		return getCourseMapper().courseToCourseDTO(
+				getCourseRepository().saveAndFlush(
+						getCourseMapper().courseDTOToCourse(object)));
+	}
+
+	@Override
+	public CourseDTO update(final Long id, CourseDTO object)
+	{
+		object.setId(id);
+		return this.save(object);
+	}
+
+	@Override
+	public void delete(final CourseDTO object)
+	{
+		getCourseRepository().delete(getCourseMapper().courseDTOToCourse(object));
 	}
 
 	@Override
@@ -52,5 +75,10 @@ public class CourseSDJpaService implements CourseService
 	public CourseRepository getCourseRepository()
 	{
 		return courseRepository;
+	}
+
+	public CourseMapper getCourseMapper()
+	{
+		return courseMapper;
 	}
 }

@@ -1,8 +1,8 @@
 package com.springframework.universitycourses.services;
 
-import com.springframework.universitycourses.model.Teacher;
+import com.springframework.universitycourses.api.v1.model.TeacherDTO;
 
 
-public interface TeacherService extends CrudService<Teacher, Long>
+public interface TeacherService extends CrudService<TeacherDTO, Long>
 {
 }
