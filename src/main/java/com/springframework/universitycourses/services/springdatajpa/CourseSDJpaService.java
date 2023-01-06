@@ -2,10 +2,17 @@ package com.springframework.universitycourses.services.springdatajpa;
 
 import com.springframework.universitycourses.api.v1.mapper.CourseMapper;
 import com.springframework.universitycourses.api.v1.model.CourseDTO;
+import com.springframework.universitycourses.model.Assignment;
+import com.springframework.universitycourses.model.Course;
+import com.springframework.universitycourses.repositories.AssignmentRepository;
 import com.springframework.universitycourses.repositories.CourseRepository;
 import com.springframework.universitycourses.services.CourseService;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,11 +21,17 @@ import java.util.stream.Collectors;
 public class CourseSDJpaService implements CourseService
 {
 	private final CourseRepository courseRepository;
+	private final AssignmentRepository assignmentRepository;
+	private final AssignmentSDJpaService assignmentSDJpaService;
 	private final CourseMapper courseMapper;
 
-	public CourseSDJpaService(final CourseRepository courseRepository, final CourseMapper courseMapper)
+	public CourseSDJpaService(final CourseRepository courseRepository, final AssignmentRepository assignmentRepository,
+			final AssignmentSDJpaService assignmentSDJpaService,
+			final CourseMapper courseMapper)
 	{
 		this.courseRepository = courseRepository;
+		this.assignmentRepository = assignmentRepository;
+		this.assignmentSDJpaService = assignmentSDJpaService;
 		this.courseMapper = courseMapper;
 	}
 
@@ -28,6 +41,21 @@ public class CourseSDJpaService implements CourseService
 		return getCourseRepository().findById(id)
 				.map(getCourseMapper()::courseToCourseDTO)
 				.orElse(null);
+	}
+
+	public Course findByModelById(final Long id)
+	{
+		Optional<Course> course = getCourseRepository().findById(id);
+		course.ifPresent(value -> setAssignments(value, getAssignmentRepository().findAll()));
+
+		return course.orElse(null);
+	}
+
+	protected static void setAssignments(final Course course, final List<Assignment> assignments)
+	{
+		course.setAssignments(new HashSet<>(assignments.stream()
+				.filter(assignment -> Objects.equals(assignment.getCourse().getId(), course.getId()))
+				.collect(Collectors.toSet())));
 	}
 
 	@Override
@@ -42,15 +70,23 @@ public class CourseSDJpaService implements CourseService
 	@Override
 	public CourseDTO createNew(final CourseDTO object)
 	{
+		object.setAssignments(new HashSet<>());
 		return this.save(object);
 	}
 
 	@Override
 	public CourseDTO save(final CourseDTO object)
 	{
-		return getCourseMapper().courseToCourseDTO(
-				getCourseRepository().saveAndFlush(
-						getCourseMapper().courseDTOToCourse(object)));
+		Course course = getCourseMapper().courseDTOToCourse(object);
+
+		course.setAssignments(this.findByModelById(course.getId()).getAssignments());
+		course.getAssignments().forEach(assignment -> {
+			Assignment assignmentSaved = getAssignmentSDJpaService().findByModelById(assignment.getId());
+			assignment.setCourse(assignmentSaved.getCourse());
+			assignment.setTeacher(assignmentSaved.getTeacher());
+		});
+
+		return getCourseMapper().courseToCourseDTO(getCourseRepository().saveAndFlush(course));
 	}
 
 	@Override
@@ -69,12 +105,28 @@ public class CourseSDJpaService implements CourseService
 	@Override
 	public void deleteById(final Long id)
 	{
+		Optional<Course> courseOptional = getCourseRepository().findById(id);
+		courseOptional.ifPresent(course -> {
+			course.getAssignments().forEach(assignment -> getAssignmentSDJpaService().deleteById(assignment.getId()));
+			getCourseRepository().save(course);
+		});
+
 		getCourseRepository().deleteById(id);
 	}
 
 	public CourseRepository getCourseRepository()
 	{
 		return courseRepository;
+	}
+
+	public AssignmentSDJpaService getAssignmentSDJpaService()
+	{
+		return assignmentSDJpaService;
+	}
+
+	public AssignmentRepository getAssignmentRepository()
+	{
+		return assignmentRepository;
 	}
 
 	public CourseMapper getCourseMapper()

@@ -2,8 +2,10 @@ package com.springframework.universitycourses.services.springdatajpa;
 
 import com.springframework.universitycourses.api.v1.mapper.StudentMapper;
 import com.springframework.universitycourses.api.v1.model.StudentDTO;
+import com.springframework.universitycourses.model.Assignment;
 import com.springframework.universitycourses.model.Enrollment;
 import com.springframework.universitycourses.model.Student;
+import com.springframework.universitycourses.repositories.AssignmentRepository;
 import com.springframework.universitycourses.repositories.EnrollmentRepository;
 import com.springframework.universitycourses.repositories.StudentRepository;
 import com.springframework.universitycourses.services.StudentService;
@@ -22,13 +24,15 @@ public class StudentSDJpaService implements StudentService
 {
 	private final StudentRepository studentRepository;
 	private final EnrollmentRepository enrollmentRepository;
+	private final AssignmentRepository assignmentRepository;
 	private final StudentMapper studentMapper;
 
 	public StudentSDJpaService(final StudentRepository studentRepository, final EnrollmentRepository enrollmentRepository,
-			final StudentMapper studentMapper)
+			final AssignmentRepository assignmentRepository, final StudentMapper studentMapper)
 	{
 		this.studentRepository = studentRepository;
 		this.enrollmentRepository = enrollmentRepository;
+		this.assignmentRepository = assignmentRepository;
 		this.studentMapper = studentMapper;
 	}
 
@@ -70,6 +74,7 @@ public class StudentSDJpaService implements StudentService
 	@Override
 	public StudentDTO save(final StudentDTO object)
 	{
+		object.setEnrollments(new HashSet<>());
 		return getStudentMapper().studentToStudentDTO(
 				getStudentRepository().saveAndFlush(getStudentMapper().studentDTOToStudent(object)));
 	}
@@ -96,6 +101,28 @@ public class StudentSDJpaService implements StudentService
 	@Override
 	public void deleteById(final Long id)
 	{
+		Optional<Student> student = getStudentRepository().findById(id);
+
+		student.ifPresent(value -> {
+			setEnrollments(getEnrollmentRepository().findAll(), value);
+			value.getEnrollments().forEach(enrollment -> {
+				enrollment.setStudent(null);
+
+				Assignment assignment = enrollment.getAssignment();
+				Optional<Enrollment> enrollmentToRemove = assignment.getEnrollments().stream()
+						.filter(enrollment1 -> enrollment.getId().equals(enrollment1.getId())).findFirst();
+				enrollmentToRemove.ifPresent(enrollmentToRemove1 -> assignment.getEnrollments().remove(enrollmentToRemove1));
+
+				getAssignmentRepository().save(assignment);
+
+				enrollment.setAssignment(null);
+				getEnrollmentRepository().save(enrollment);
+				getEnrollmentRepository().deleteById(enrollment.getId());
+			});
+			//			assignment1.setCourse(null);
+			value.setEnrollments(null);
+			this.save(value);
+		});
 		getStudentRepository().deleteById(id);
 	}
 
@@ -107,6 +134,11 @@ public class StudentSDJpaService implements StudentService
 	public EnrollmentRepository getEnrollmentRepository()
 	{
 		return enrollmentRepository;
+	}
+
+	public AssignmentRepository getAssignmentRepository()
+	{
+		return assignmentRepository;
 	}
 
 	public StudentMapper getStudentMapper()

@@ -1,9 +1,12 @@
 package com.springframework.universitycourses.api.v1.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Date;
 
 
 @Setter
@@ -13,9 +16,8 @@ import lombok.Setter;
 public class EnrollmentDTO
 {
 	private EnrollmentIdDTO id;
-	private StudentDTO student;
-	private AssignmentDTO assignment;
-	private String enrollmentDate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+	private Date enrollmentDate;
 	private Long grade;
 	private String inProgress;
 }

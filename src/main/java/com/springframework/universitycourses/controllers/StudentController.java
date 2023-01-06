@@ -1,4 +1,4 @@
-package com.springframework.universitycourses.bootstrap.controllers;
+package com.springframework.universitycourses.controllers;
 
 import com.springframework.universitycourses.api.v1.model.StudentDTO;
 import com.springframework.universitycourses.api.v1.model.StudentListDTO;

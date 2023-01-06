@@ -5,7 +5,9 @@ import com.springframework.universitycourses.api.v1.mapper.EnrollmentMapper;
 import com.springframework.universitycourses.api.v1.model.EnrollmentDTO;
 import com.springframework.universitycourses.api.v1.model.EnrollmentIdDTO;
 import com.springframework.universitycourses.model.Enrollment;
+import com.springframework.universitycourses.repositories.AssignmentRepository;
 import com.springframework.universitycourses.repositories.EnrollmentRepository;
+import com.springframework.universitycourses.repositories.StudentRepository;
 import com.springframework.universitycourses.services.EnrollmentService;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +19,18 @@ import java.util.stream.Collectors;
 public class EnrollmentSDJpaService implements EnrollmentService
 {
 	private final EnrollmentRepository enrollmentRepository;
+	private final StudentRepository studentRepository;
+	private final AssignmentRepository assignmentRepository;
 	private final EnrollmentMapper enrollmentMapper;
 	private final EnrollmentIdMapper enrollmentIdMapper;
 
-	public EnrollmentSDJpaService(final EnrollmentRepository enrollmentRepository, final EnrollmentMapper enrollmentMapper,
+	public EnrollmentSDJpaService(final EnrollmentRepository enrollmentRepository, final StudentRepository studentRepository,
+			final AssignmentRepository assignmentRepository, final EnrollmentMapper enrollmentMapper,
 			final EnrollmentIdMapper enrollmentIdMapper)
 	{
 		this.enrollmentRepository = enrollmentRepository;
+		this.studentRepository = studentRepository;
+		this.assignmentRepository = assignmentRepository;
 		this.enrollmentMapper = enrollmentMapper;
 		this.enrollmentIdMapper = enrollmentIdMapper;
 	}
@@ -54,8 +61,12 @@ public class EnrollmentSDJpaService implements EnrollmentService
 	@Override
 	public EnrollmentDTO save(final EnrollmentDTO object)
 	{
+		Enrollment enrollment = getEnrollmentMapper().enrollmentDTOToEnrollment(object);
+		enrollment.setStudent(getStudentRepository().findById(object.getId().getStudentId()).orElse(null));
+		enrollment.setAssignment(getAssignmentRepository().findById(object.getId().getAssignmentId()).orElse(null));
+
 		return getEnrollmentMapper().enrollmentToEnrollmentDTO(
-				getEnrollmentRepository().saveAndFlush(getEnrollmentMapper().enrollmentDTOToEnrollment(object)));
+				getEnrollmentRepository().saveAndFlush(enrollment));
 	}
 
 	@Override
@@ -86,6 +97,16 @@ public class EnrollmentSDJpaService implements EnrollmentService
 	public EnrollmentRepository getEnrollmentRepository()
 	{
 		return enrollmentRepository;
+	}
+
+	public StudentRepository getStudentRepository()
+	{
+		return studentRepository;
+	}
+
+	public AssignmentRepository getAssignmentRepository()
+	{
+		return assignmentRepository;
 	}
 
 	public EnrollmentMapper getEnrollmentMapper()

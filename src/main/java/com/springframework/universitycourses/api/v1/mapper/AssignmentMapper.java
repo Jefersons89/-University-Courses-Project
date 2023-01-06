@@ -9,32 +9,17 @@ import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 
+@Mapper
 @Named("AssignmentMapper")
-@Mapper(uses = { CourseMapper.class, TeacherMapper.class, EnrollmentMapper.class })
 public interface AssignmentMapper
 {
 	AssignmentMapper INSTANCE = Mappers.getMapper(AssignmentMapper.class);
 
+	@Named("assignmentToAssignmentDTO")
 	@Mappings({
-			@Mapping(target = "course", qualifiedByName = { "CourseMapper", "toCourseDTOWithoutAssignments" }),
-			@Mapping(target = "teacher", qualifiedByName = { "TeacherMapper", "toTeacherDTOWithoutAssignments" }),
-			@Mapping(target = "enrollments", qualifiedByName = { "EnrollmentMapper", "toEnrollmentDTOWithoutAssignment" }) })
+			@Mapping(target = "courseId", expression = "java(assignment.getCourse().getId())"),
+			@Mapping(target = "teacherId", expression = "java(assignment.getTeacher().getId())") })
 	AssignmentDTO assignmentToAssignmentDTO(Assignment assignment);
 
 	Assignment assignmentDTOToAssignment(AssignmentDTO assignmentDTO);
-
-	@Named("toAssignmentDTOWithoutCourse")
-	@Mappings({
-			@Mapping(target = "course", ignore = true) })
-	AssignmentDTO toAssignmentDTOWithoutCourse(Assignment assignment);
-
-	@Named("toAssignmentDTOWithoutTeacher")
-	@Mappings({
-			@Mapping(target = "teacher", ignore = true) })
-	AssignmentDTO toAssignmentDTOWithoutTeacher(Assignment assignment);
-
-	@Named("toAssignmentDTOWithoutEnrollments")
-	@Mappings({
-			@Mapping(target = "enrollments", ignore = true) })
-	AssignmentDTO toAssignmentDTOWithoutEnrollments(Assignment assignment);
 }

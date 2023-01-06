@@ -1,4 +1,4 @@
-package com.springframework.universitycourses.bootstrap.controllers;
+package com.springframework.universitycourses.controllers;
 
 import com.springframework.universitycourses.api.v1.model.AssignmentDTO;
 import com.springframework.universitycourses.api.v1.model.AssignmentListDTO;
@@ -38,20 +38,6 @@ public class AssignmentController
 	@ResponseStatus(HttpStatus.OK)
 	public AssignmentListDTO getListOfAssignments()
 	{
-		//		CourseDTO courseDTO = new CourseDTO();
-		//		courseDTO.setId(1L);
-		//		courseDTO.setTitle("test");
-		//		TeacherDTO teacherDTO = new TeacherDTO();
-		//		teacherDTO.setId(2L);
-		//		teacherDTO.setFirstName("testTeacher");
-		//		EnrollmentDTO enrollmentDTO = new EnrollmentDTO();
-		//		EnrollmentIdDTO enrollmentIdDTO = new EnrollmentIdDTO(6L, 8L);
-		//		enrollmentDTO.setId(enrollmentIdDTO);
-		//		Set<EnrollmentDTO> enrollmentDTOSet = new HashSet<>();
-		//		AssignmentDTO assignmentDTO = new AssignmentDTO(1L, "title", "description", 13L, courseDTO, teacherDTO, enrollmentDTOSet);
-		//		Set<AssignmentDTO> assignmentDTOSet = new HashSet<>();
-		//		assignmentDTOSet.add(assignmentDTO);
-		//		return new AssignmentListDTO(assignmentDTOSet);
 		return new AssignmentListDTO(getAssignmentService().findAll());
 	}
 
