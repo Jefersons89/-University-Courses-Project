@@ -8,6 +8,7 @@ import lombok.Setter;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
@@ -30,7 +31,7 @@ public class Course extends LearningMaterial
 	@Column
 	private Long credit;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "course")
 	private Set<Assignment> assignments = new HashSet<>();
 
 	@Builder
