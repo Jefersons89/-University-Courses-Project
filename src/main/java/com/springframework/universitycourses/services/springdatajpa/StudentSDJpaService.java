@@ -2,6 +2,7 @@ package com.springframework.universitycourses.services.springdatajpa;
 
 import com.springframework.universitycourses.api.v1.mapper.StudentMapper;
 import com.springframework.universitycourses.api.v1.model.StudentDTO;
+import com.springframework.universitycourses.exceptions.NotFoundException;
 import com.springframework.universitycourses.model.Assignment;
 import com.springframework.universitycourses.model.Enrollment;
 import com.springframework.universitycourses.model.Student;
@@ -11,6 +12,7 @@ import com.springframework.universitycourses.repositories.StudentRepository;
 import com.springframework.universitycourses.services.StudentService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +42,12 @@ public class StudentSDJpaService implements StudentService
 	public StudentDTO findById(final Long id)
 	{
 		Optional<Student> student = getStudentRepository().findById(id);
+
+		if (student.isEmpty())
+		{
+			throw new NotFoundException("Student Not Found");
+		}
+
 		student.ifPresent(value -> setEnrollments(getEnrollmentRepository().findAll(), value));
 
 		return student
@@ -60,9 +68,16 @@ public class StudentSDJpaService implements StudentService
 
 	private static void setEnrollments(final List<Enrollment> enrollments, final Student student)
 	{
-		student.setEnrollments(new HashSet<>(enrollments.stream()
-				.filter(enrollment -> Objects.equals(enrollment.getId().getStudentId(), student.getId()))
-				.collect(Collectors.toSet())));
+		if (Objects.nonNull(enrollments))
+		{
+			student.setEnrollments(new HashSet<>(enrollments.stream()
+					.filter(enrollment -> Objects.equals(enrollment.getId().getStudentId(), student.getId()))
+					.collect(Collectors.toSet())));
+		}
+		else
+		{
+			student.setEnrollments(Collections.emptySet());
+		}
 	}
 
 	@Override
@@ -103,6 +118,11 @@ public class StudentSDJpaService implements StudentService
 	{
 		Optional<Student> student = getStudentRepository().findById(id);
 
+		if (student.isEmpty())
+		{
+			throw new NotFoundException("Student Not Found");
+		}
+
 		student.ifPresent(value -> {
 			setEnrollments(getEnrollmentRepository().findAll(), value);
 			value.getEnrollments().forEach(enrollment -> {
@@ -119,7 +139,6 @@ public class StudentSDJpaService implements StudentService
 				getEnrollmentRepository().save(enrollment);
 				getEnrollmentRepository().deleteById(enrollment.getId());
 			});
-			//			assignment1.setCourse(null);
 			value.setEnrollments(null);
 			this.save(value);
 		});

@@ -2,6 +2,7 @@ package com.springframework.universitycourses.services.springdatajpa;
 
 import com.springframework.universitycourses.api.v1.mapper.AssignmentMapper;
 import com.springframework.universitycourses.api.v1.model.AssignmentDTO;
+import com.springframework.universitycourses.exceptions.NotFoundException;
 import com.springframework.universitycourses.model.Assignment;
 import com.springframework.universitycourses.model.Course;
 import com.springframework.universitycourses.model.Enrollment;
@@ -15,6 +16,7 @@ import com.springframework.universitycourses.repositories.TeacherRepository;
 import com.springframework.universitycourses.services.AssignmentService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -50,6 +52,12 @@ public class AssignmentSDJpaService implements AssignmentService
 	public AssignmentDTO findById(final Long id)
 	{
 		Optional<Assignment> assignment = getAssignmentRepository().findById(id);
+
+		if (assignment.isEmpty())
+		{
+			throw new NotFoundException("Assignment Not Found for id: " + id);
+		}
+
 		assignment.ifPresent(value -> setEnrollments(value, getEnrollmentRepository().findAll()));
 
 		return assignment
@@ -61,6 +69,12 @@ public class AssignmentSDJpaService implements AssignmentService
 	public Assignment findByModelById(final Long id)
 	{
 		Optional<Assignment> assignment = getAssignmentRepository().findById(id);
+
+		if (assignment.isEmpty())
+		{
+			throw new NotFoundException("Assignment Not Found");
+		}
+
 		assignment.ifPresent(value -> setEnrollments(value, getEnrollmentRepository().findAll()));
 
 		return assignment.orElse(null);
@@ -79,9 +93,16 @@ public class AssignmentSDJpaService implements AssignmentService
 
 	protected static void setEnrollments(final Assignment assignment, final List<Enrollment> enrollments)
 	{
-		assignment.setEnrollments(new HashSet<>(enrollments.stream()
-				.filter(enrollment -> Objects.equals(enrollment.getId().getAssignmentId(), assignment.getId()))
-				.collect(Collectors.toSet())));
+		if (Objects.nonNull(enrollments))
+		{
+			assignment.setEnrollments(new HashSet<>(enrollments.stream()
+					.filter(enrollment -> Objects.equals(enrollment.getId().getAssignmentId(), assignment.getId()))
+					.collect(Collectors.toSet())));
+		}
+		else
+		{
+			assignment.setEnrollments(Collections.emptySet());
+		}
 	}
 
 	@Override
@@ -94,8 +115,22 @@ public class AssignmentSDJpaService implements AssignmentService
 	public AssignmentDTO save(final AssignmentDTO object)
 	{
 		Assignment assignment = getAssignmentMapper().assignmentDTOToAssignment(object);
-		assignment.setCourse(getCourseRepository().findById(object.getCourseId()).orElse(Course.builder().build()));
-		assignment.setTeacher(getTeacherRepository().findById(object.getTeacherId()).orElse(Teacher.builder().build()));
+		Optional<Course> course = getCourseRepository().findById(object.getCourseId());
+
+		if (course.isEmpty())
+		{
+			throw new NotFoundException("Course Not Found");
+		}
+
+		assignment.setCourse(course.get());
+		Optional<Teacher> teacher = getTeacherRepository().findById(object.getTeacherId());
+
+		if (teacher.isEmpty())
+		{
+			throw new NotFoundException("Teacher Not Found");
+		}
+
+		assignment.setTeacher(teacher.get());
 
 		if (Objects.nonNull(assignment.getEnrollments()) && !assignment.getEnrollments().isEmpty())
 		{
@@ -135,6 +170,11 @@ public class AssignmentSDJpaService implements AssignmentService
 	public void deleteById(final Long id)
 	{
 		Optional<Assignment> assignment = getAssignmentRepository().findById(id);
+
+		if (assignment.isEmpty())
+		{
+			throw new NotFoundException("Assignment Not Found");
+		}
 
 		assignment.ifPresent(value -> {
 			setEnrollments(value, getEnrollmentRepository().findAll());

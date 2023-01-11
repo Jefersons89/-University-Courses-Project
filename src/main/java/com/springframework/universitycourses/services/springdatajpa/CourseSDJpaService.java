@@ -2,6 +2,7 @@ package com.springframework.universitycourses.services.springdatajpa;
 
 import com.springframework.universitycourses.api.v1.mapper.CourseMapper;
 import com.springframework.universitycourses.api.v1.model.CourseDTO;
+import com.springframework.universitycourses.exceptions.NotFoundException;
 import com.springframework.universitycourses.model.Assignment;
 import com.springframework.universitycourses.model.Course;
 import com.springframework.universitycourses.repositories.AssignmentRepository;
@@ -38,6 +39,13 @@ public class CourseSDJpaService implements CourseService
 	@Override
 	public CourseDTO findById(final Long id)
 	{
+		Optional<Course> course = getCourseRepository().findById(id);
+
+		if (course.isEmpty())
+		{
+			throw new NotFoundException("Course Not Found");
+		}
+
 		return getCourseRepository().findById(id)
 				.map(getCourseMapper()::courseToCourseDTO)
 				.orElse(null);
@@ -46,6 +54,12 @@ public class CourseSDJpaService implements CourseService
 	public Course findByModelById(final Long id)
 	{
 		Optional<Course> course = getCourseRepository().findById(id);
+
+		if (course.isEmpty())
+		{
+			throw new NotFoundException("Course Not Found");
+		}
+
 		course.ifPresent(value -> setAssignments(value, getAssignmentRepository().findAll()));
 
 		return course.orElse(null);
@@ -106,6 +120,12 @@ public class CourseSDJpaService implements CourseService
 	public void deleteById(final Long id)
 	{
 		Optional<Course> courseOptional = getCourseRepository().findById(id);
+
+		if (courseOptional.isEmpty())
+		{
+			throw new NotFoundException("Course Not Found");
+		}
+
 		courseOptional.ifPresent(course -> {
 			course.getAssignments().forEach(assignment -> getAssignmentSDJpaService().deleteById(assignment.getId()));
 			getCourseRepository().save(course);

@@ -2,6 +2,7 @@ package com.springframework.universitycourses.services.springdatajpa;
 
 import com.springframework.universitycourses.api.v1.mapper.TeacherMapper;
 import com.springframework.universitycourses.api.v1.model.TeacherDTO;
+import com.springframework.universitycourses.exceptions.NotFoundException;
 import com.springframework.universitycourses.model.Teacher;
 import com.springframework.universitycourses.repositories.AssignmentRepository;
 import com.springframework.universitycourses.repositories.TeacherRepository;
@@ -32,7 +33,14 @@ public class TeacherSDJpaService implements TeacherService
 	@Override
 	public TeacherDTO findById(final Long id)
 	{
-		return getTeacherRepository().findById(id)
+		Optional<Teacher> teacher = getTeacherRepository().findById(id);
+
+		if (teacher.isEmpty())
+		{
+			throw new NotFoundException("Teacher Not Found");
+		}
+
+		return teacher
 				.map(getTeacherMapper()::teacherToTeacherDTO)
 				.orElse(null);
 	}
@@ -83,6 +91,11 @@ public class TeacherSDJpaService implements TeacherService
 	public void deleteById(final Long id)
 	{
 		Optional<Teacher> teacher = getTeacherRepository().findById(id);
+
+		if (teacher.isEmpty())
+		{
+			throw new NotFoundException("Teacher Not Found");
+		}
 
 		teacher.ifPresent(value -> {
 			value.getAssignments().forEach(assignment -> {

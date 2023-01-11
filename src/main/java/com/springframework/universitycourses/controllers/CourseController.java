@@ -18,9 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/courses")
+@RequestMapping(CourseController.BASE_URL)
 public class CourseController
 {
+	public static final String BASE_URL = "/courses";
 	private final CourseService courseService;
 
 	public CourseController(final CourseService courseService)

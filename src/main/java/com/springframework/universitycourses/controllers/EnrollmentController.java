@@ -19,9 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/enrollments")
+@RequestMapping(EnrollmentController.BASE_URL)
 public class EnrollmentController
 {
+	public static final String BASE_URL = "/enrollments";
 	private final EnrollmentService enrollmentService;
 
 	public EnrollmentController(final EnrollmentService enrollmentService)
@@ -42,11 +43,11 @@ public class EnrollmentController
 		return new EnrollmentListDTO(getEnrollmentService().findAll());
 	}
 
-	@GetMapping({ "/{studentId}/{enrollmentId}" })
+	@GetMapping({ "/{studentId}/{assignmentId}" })
 	@ResponseStatus(HttpStatus.OK)
-	public EnrollmentDTO getEnrollmentById(@PathVariable Long studentId, @PathVariable Long enrollmentId)
+	public EnrollmentDTO getEnrollmentById(@PathVariable Long studentId, @PathVariable Long assignmentId)
 	{
-		EnrollmentIdDTO enrollmentIdDTO = new EnrollmentIdDTO(studentId, enrollmentId);
+		EnrollmentIdDTO enrollmentIdDTO = new EnrollmentIdDTO(studentId, assignmentId);
 		return getEnrollmentService().findById(enrollmentIdDTO);
 	}
 
@@ -57,20 +58,20 @@ public class EnrollmentController
 		return getEnrollmentService().createNew(enrollmentDTO);
 	}
 
-	@PutMapping({ "/{studentId}/{enrollmentId}" })
+	@PutMapping({ "/{studentId}/{assignmentId}" })
 	@ResponseStatus(HttpStatus.OK)
-	public EnrollmentDTO updateEnrollment(@PathVariable Long studentId, @PathVariable Long enrollmentId,
+	public EnrollmentDTO updateEnrollment(@PathVariable Long studentId, @PathVariable Long assignmentId,
 			@RequestBody EnrollmentDTO enrollmentDTO)
 	{
-		EnrollmentIdDTO enrollmentIdDTO = new EnrollmentIdDTO(studentId, enrollmentId);
+		EnrollmentIdDTO enrollmentIdDTO = new EnrollmentIdDTO(studentId, assignmentId);
 		return getEnrollmentService().update(enrollmentIdDTO, enrollmentDTO);
 	}
 
-	@DeleteMapping({ "/{studentId}/{enrollmentId}" })
+	@DeleteMapping({ "/{studentId}/{assignmentId}" })
 	@ResponseStatus(HttpStatus.OK)
-	public void deleteEnrollment(@PathVariable Long studentId, @PathVariable Long enrollmentId)
+	public void deleteEnrollment(@PathVariable Long studentId, @PathVariable Long assignmentId)
 	{
-		EnrollmentIdDTO enrollmentIdDTO = new EnrollmentIdDTO(studentId, enrollmentId);
+		EnrollmentIdDTO enrollmentIdDTO = new EnrollmentIdDTO(studentId, assignmentId);
 		getEnrollmentService().deleteById(enrollmentIdDTO);
 	}
 
