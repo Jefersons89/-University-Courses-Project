@@ -183,6 +183,7 @@ class EnrollmentSDJpaServiceTest
 		when(enrollmentMapper.enrollmentDTOToEnrollment(any())).thenReturn(returnedEnrollment);
 		when(studentRepository.findById(anyLong())).thenReturn(Optional.ofNullable(returnedStudent));
 		when(assignmentRepository.findById(anyLong())).thenReturn(Optional.ofNullable(returnedAssignment));
+		when(enrollmentRepository.findById(any())).thenReturn(Optional.ofNullable(returnedEnrollment));
 		when(enrollmentRepository.saveAndFlush(any())).thenReturn(returnedEnrollment);
 		when(enrollmentMapper.enrollmentToEnrollmentDTO(any())).thenReturn(returnedEnrollmentDTO);
 
@@ -195,6 +196,7 @@ class EnrollmentSDJpaServiceTest
 		verify(studentRepository).findById(anyLong());
 		verify(assignmentRepository).findById(anyLong());
 		verify(enrollmentRepository).saveAndFlush(any());
+		verify(enrollmentRepository).findById(any());
 		verify(enrollmentMapper, times(2)).enrollmentDTOToEnrollment(any());
 		verify(enrollmentMapper).enrollmentToEnrollmentDTO(any());
 	}

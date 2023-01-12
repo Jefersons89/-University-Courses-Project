@@ -157,6 +157,7 @@ class StudentSDJpaServiceTest
 		studentDTOToSave.setId(ID);
 		studentDTOToSave.setEmail(EMAIL);
 
+		when(studentRepository.findById(anyLong())).thenReturn(Optional.ofNullable(returnedStudent));
 		when(studentRepository.saveAndFlush(any())).thenReturn(returnedStudent);
 		when(studentMapper.studentDTOToStudent(any())).thenReturn(returnedStudent);
 		when(studentMapper.studentToStudentDTO(any())).thenReturn(returnedStudentDTO);
@@ -167,6 +168,7 @@ class StudentSDJpaServiceTest
 		assertEquals(returnedStudent.getId(), student.getId());
 
 		verify(studentRepository).saveAndFlush(any());
+		verify(studentRepository).findById(anyLong());
 		verify(studentMapper, times(2)).studentDTOToStudent(any());
 		verify(studentMapper).studentToStudentDTO(any());
 	}

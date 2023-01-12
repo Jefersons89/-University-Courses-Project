@@ -14,6 +14,10 @@ import com.springframework.universitycourses.repositories.EnrollmentRepository;
 import com.springframework.universitycourses.repositories.StudentRepository;
 import com.springframework.universitycourses.repositories.TeacherRepository;
 import com.springframework.universitycourses.services.AssignmentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -83,7 +87,12 @@ public class AssignmentSDJpaService implements AssignmentService
 	@Override
 	public Set<AssignmentDTO> findAll()
 	{
-		List<Assignment> assignments = getAssignmentRepository().findAll();
+		Pageable sortedByTitle =
+				PageRequest.of(0, 3, Sort.by("title"));
+
+		Page<Assignment> assignments = getAssignmentRepository().findAll(sortedByTitle);
+
+		//		List<Assignment> assignments = getAssignmentRepository().findAll();
 		assignments.forEach(assignment -> setEnrollments(assignment, getEnrollmentRepository().findAll()));
 
 		return assignments.stream()

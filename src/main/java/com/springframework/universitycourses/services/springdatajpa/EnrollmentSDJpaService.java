@@ -13,6 +13,9 @@ import com.springframework.universitycourses.repositories.AssignmentRepository;
 import com.springframework.universitycourses.repositories.EnrollmentRepository;
 import com.springframework.universitycourses.repositories.StudentRepository;
 import com.springframework.universitycourses.services.EnrollmentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -62,7 +65,12 @@ public class EnrollmentSDJpaService implements EnrollmentService
 	@Override
 	public Set<EnrollmentDTO> findAll()
 	{
-		return getEnrollmentRepository().findAll()
+		Pageable firstPageWithThreeElements =
+				PageRequest.of(0, 3);
+
+		Page<Enrollment> enrollments = getEnrollmentRepository().findAll(firstPageWithThreeElements);
+
+		return enrollments
 				.stream()
 				.map(getEnrollmentMapper()::enrollmentToEnrollmentDTO)
 				.collect(Collectors.toSet());

@@ -22,7 +22,7 @@ import java.util.Set;
 @Table(name = "students")
 public class Student extends User
 {
-	@NotNull
+	@NotNull(message = "Enrollment Year is mandatory")
 	@Column(name = "enrollment_year")
 	private Date enrollmentYear;
 

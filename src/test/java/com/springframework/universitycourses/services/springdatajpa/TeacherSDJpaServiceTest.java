@@ -149,6 +149,7 @@ class TeacherSDJpaServiceTest
 		teacherDTOToSave.setId(ID);
 		teacherDTOToSave.setEmail(EMAIL);
 
+		when(teacherRepository.findById(anyLong())).thenReturn(Optional.ofNullable(returnedTeacher));
 		when(teacherRepository.saveAndFlush(any())).thenReturn(returnedTeacher);
 		when(teacherMapper.teacherDTOToTeacher(any())).thenReturn(returnedTeacher);
 		when(teacherMapper.teacherToTeacherDTO(any())).thenReturn(returnedTeacherDTO);

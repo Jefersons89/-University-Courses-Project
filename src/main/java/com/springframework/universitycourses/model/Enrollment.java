@@ -11,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -33,14 +35,17 @@ public class Enrollment
 	@MapsId("assignmentId")
 	private Assignment assignment;
 
-	@NotNull
+	@NotNull(message = "Enrollment Date is mandatory")
 	@Column(name = "enrollment_date")
 	private Date enrollmentDate;
 
-	@NotNull
+	@Max(5)
+	@Min(0)
+	@NotNull(message = "Grade is mandatory")
 	@Column(name = "grade")
 	private Long grade;
 
+	@NotNull(message = "Progress Stage is mandatory")
 	@Column(name = "in_progress")
 	private Boolean inProgress;
 

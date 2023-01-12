@@ -3,11 +3,14 @@ package com.springframework.universitycourses.services.springdatajpa;
 import com.springframework.universitycourses.api.v1.mapper.TeacherMapper;
 import com.springframework.universitycourses.api.v1.model.TeacherDTO;
 import com.springframework.universitycourses.exceptions.NotFoundException;
-import com.springframework.universitycourses.model.Assignment;
 import com.springframework.universitycourses.model.Teacher;
 import com.springframework.universitycourses.repositories.AssignmentRepository;
 import com.springframework.universitycourses.repositories.TeacherRepository;
 import com.springframework.universitycourses.services.TeacherService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -49,7 +52,12 @@ public class TeacherSDJpaService implements TeacherService
 	@Override
 	public Set<TeacherDTO> findAll()
 	{
-		return getTeacherRepository().findAll()
+		Pageable sortedByFirstName =
+				PageRequest.of(0, 3, Sort.by("firstName"));
+
+		Page<Teacher> teachers = getTeacherRepository().findAll(sortedByFirstName);
+
+		return teachers
 				.stream()
 				.map(getTeacherMapper()::teacherToTeacherDTO)
 				.collect(Collectors.toSet());
@@ -77,9 +85,9 @@ public class TeacherSDJpaService implements TeacherService
 	@Override
 	public TeacherDTO update(final Long id, TeacherDTO object)
 	{
-		Optional<Assignment> assignment = getAssignmentRepository().findById(id);
+		Optional<Teacher> teacher = getTeacherRepository().findById(id);
 
-		if (assignment.isEmpty())
+		if (teacher.isEmpty())
 		{
 			throw new NotFoundException("Teacher Not Found for id: " + id);
 		}

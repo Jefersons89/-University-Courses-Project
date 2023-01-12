@@ -10,6 +10,10 @@ import com.springframework.universitycourses.repositories.AssignmentRepository;
 import com.springframework.universitycourses.repositories.EnrollmentRepository;
 import com.springframework.universitycourses.repositories.StudentRepository;
 import com.springframework.universitycourses.services.StudentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -58,7 +62,12 @@ public class StudentSDJpaService implements StudentService
 	@Override
 	public Set<StudentDTO> findAll()
 	{
-		List<Student> students = getStudentRepository().findAll();
+		Pageable sortedByFirstName =
+				PageRequest.of(0, 3, Sort.by("firstName"));
+
+		Page<Student> students = getStudentRepository().findAll(sortedByFirstName);
+
+		//		List<Student> students = getStudentRepository().findAll();
 		students.forEach(student -> setEnrollments(getEnrollmentRepository().findAll(), student));
 
 		return students.stream()

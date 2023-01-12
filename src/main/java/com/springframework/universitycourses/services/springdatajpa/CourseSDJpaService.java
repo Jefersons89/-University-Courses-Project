@@ -8,6 +8,10 @@ import com.springframework.universitycourses.model.Course;
 import com.springframework.universitycourses.repositories.AssignmentRepository;
 import com.springframework.universitycourses.repositories.CourseRepository;
 import com.springframework.universitycourses.services.CourseService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -75,7 +79,12 @@ public class CourseSDJpaService implements CourseService
 	@Override
 	public Set<CourseDTO> findAll()
 	{
-		return getCourseRepository().findAll()
+		Pageable sortedByTitle =
+				PageRequest.of(0, 3, Sort.by("title"));
+
+		Page<Course> courses = getCourseRepository().findAll(sortedByTitle);
+
+		return courses
 				.stream()
 				.map(getCourseMapper()::courseToCourseDTO)
 				.collect(Collectors.toSet());

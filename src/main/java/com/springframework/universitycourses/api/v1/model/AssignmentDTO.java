@@ -22,18 +22,26 @@ import java.util.Set;
 public class AssignmentDTO
 {
 	private Long id;
+
+	@NotNull(message = "Description is mandatory")
+	@NotBlank(message = "Title is mandatory")
+	@Size(min = 5, max = 50)
 	private String title;
 
 	@NotNull(message = "Description is mandatory")
 	@NotBlank(message = "Description is mandatory")
-	@Size(min = 5, max = 150)
+	@Size(min = 5, max = 255)
 	private String description;
 
 	@NotNull
 	@Max(30)
 	@Min(15)
 	private Long points;
+
+	@NotNull(message = "Description is mandatory")
 	private Long courseId;
+
+	@NotNull(message = "Description is mandatory")
 	private Long teacherId;
 	private Set<EnrollmentDTO> enrollments;
 }
