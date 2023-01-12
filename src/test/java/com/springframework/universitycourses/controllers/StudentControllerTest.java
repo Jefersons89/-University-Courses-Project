@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.springframework.universitycourses.api.v1.model.StudentDTO;
+import com.springframework.universitycourses.exceptions.NotFoundException;
 import com.springframework.universitycourses.services.StudentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -40,6 +42,7 @@ class StudentControllerTest
 			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 	private static final String EMAIL = "test@dummy.com";
 	private static final Long ID = 1L;
+	private static final String NO_NUMERIC_ID = "abc";
 	Set<StudentDTO> returnedStudentDTOSet;
 	StudentDTO returnedStudentDTO;
 
@@ -62,6 +65,7 @@ class StudentControllerTest
 
 		mockMvc = MockMvcBuilders
 				.standaloneSetup(studentController)
+				.setControllerAdvice(ControllerExceptionHandler.class)
 				.build();
 	}
 
@@ -100,6 +104,26 @@ class StudentControllerTest
 				.andExpect(jsonPath("$.email", equalTo(EMAIL)));
 
 		verify(studentService).findById(anyLong());
+	}
+
+	@Test
+	void getStudentByIdNotFound() throws Exception
+	{
+		when(studentService.findById(anyLong())).thenThrow(NotFoundException.class);
+
+		mockMvc.perform(get(StudentController.BASE_URL + "/" + ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+
+		verify(studentService).findById(anyLong());
+	}
+
+	@Test
+	void getStudentByIdNumberFormatException() throws Exception
+	{
+		mockMvc.perform(get(StudentController.BASE_URL + "/" + NO_NUMERIC_ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -149,6 +173,47 @@ class StudentControllerTest
 	}
 
 	@Test
+	void updateStudentNotFound() throws Exception
+	{
+		StudentDTO studentDTOToUpdate = new StudentDTO();
+		studentDTOToUpdate.setId(ID);
+		studentDTOToUpdate.setEmail(EMAIL);
+
+		when(studentService.update(anyLong(), any())).thenThrow(NotFoundException.class);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+		String requestJson = ow.writeValueAsString(studentDTOToUpdate);
+
+		mockMvc.perform(put(StudentController.BASE_URL + "/" + ID)
+						.contentType(APPLICATION_JSON_UTF8)
+						.content(requestJson))
+				.andExpect(status().isNotFound());
+
+		verify(studentService).update(anyLong(), any());
+	}
+
+	@Test
+	void updateStudentNumberFormatException() throws Exception
+	{
+		StudentDTO studentDTOToUpdate = new StudentDTO();
+		studentDTOToUpdate.setId(ID);
+		studentDTOToUpdate.setEmail(EMAIL);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+		String requestJson = ow.writeValueAsString(studentDTOToUpdate);
+
+		mockMvc.perform(put(StudentController.BASE_URL + "/" + NO_NUMERIC_ID)
+						.contentType(APPLICATION_JSON_UTF8)
+						.content(requestJson))
+				.andExpect(status().isBadRequest());
+	}
+
+
+	@Test
 	void deleteStudent() throws Exception
 	{
 		mockMvc.perform(delete(StudentController.BASE_URL + "/" + ID)
@@ -156,5 +221,25 @@ class StudentControllerTest
 				.andExpect(status().isOk());
 
 		verify(studentService).deleteById(anyLong());
+	}
+
+	@Test
+	void deleteStudentNotFound() throws Exception
+	{
+		doThrow(NotFoundException.class).when(studentService).deleteById(anyLong());
+
+		mockMvc.perform(delete(StudentController.BASE_URL + "/" + ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+
+		verify(studentService).deleteById(anyLong());
+	}
+
+	@Test
+	void deleteStudentNumberFormatException() throws Exception
+	{
+		mockMvc.perform(delete(StudentController.BASE_URL + "/" + NO_NUMERIC_ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest());
 	}
 }

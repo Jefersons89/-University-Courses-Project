@@ -24,6 +24,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -41,6 +42,7 @@ class AssignmentControllerTest
 			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 	private static final String TITLE = "TestAssignment";
 	private static final Long ID = 1L;
+	private static final String NO_NUMERIC_ID = "abc";
 	Set<AssignmentDTO> returnedAssignmentDTOSet;
 	AssignmentDTO returnedAssignmentDTO;
 
@@ -63,6 +65,7 @@ class AssignmentControllerTest
 
 		mockMvc = MockMvcBuilders
 				.standaloneSetup(assignmentController)
+				.setControllerAdvice(new ControllerExceptionHandler())
 				.build();
 	}
 
@@ -101,6 +104,27 @@ class AssignmentControllerTest
 				.andExpect(jsonPath("$.title", equalTo(TITLE)));
 
 		verify(assignmentService).findById(anyLong());
+	}
+
+
+	@Test
+	void getAssignmentByIdNotFound() throws Exception
+	{
+		when(assignmentService.findById(anyLong())).thenThrow(NotFoundException.class);
+
+		mockMvc.perform(get(AssignmentController.BASE_URL + "/" + ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+
+		verify(assignmentService).findById(anyLong());
+	}
+
+	@Test
+	void getAssignmentByIdNumberFormatException() throws Exception
+	{
+		mockMvc.perform(get(AssignmentController.BASE_URL + "/" + NO_NUMERIC_ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -150,6 +174,46 @@ class AssignmentControllerTest
 	}
 
 	@Test
+	void updateAssignmentNotFound() throws Exception
+	{
+		AssignmentDTO assignmentDTOToUpdated = new AssignmentDTO();
+		assignmentDTOToUpdated.setId(ID);
+		assignmentDTOToUpdated.setTitle(TITLE);
+
+		when(assignmentService.update(anyLong(), any())).thenThrow(NotFoundException.class);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+		String requestJson = ow.writeValueAsString(assignmentDTOToUpdated);
+
+		mockMvc.perform(put(AssignmentController.BASE_URL + "/" + ID)
+						.contentType(APPLICATION_JSON_UTF8)
+						.content(requestJson))
+				.andExpect(status().isNotFound());
+
+		verify(assignmentService).update(anyLong(), any());
+	}
+
+	@Test
+	void updateAssignmentNumberFormatException() throws Exception
+	{
+		AssignmentDTO assignmentDTOToUpdated = new AssignmentDTO();
+		assignmentDTOToUpdated.setId(ID);
+		assignmentDTOToUpdated.setTitle(TITLE);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+		String requestJson = ow.writeValueAsString(assignmentDTOToUpdated);
+
+		mockMvc.perform(put(AssignmentController.BASE_URL + "/" + NO_NUMERIC_ID)
+						.contentType(APPLICATION_JSON_UTF8)
+						.content(requestJson))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
 	void deleteAssignment() throws Exception
 	{
 		mockMvc.perform(delete(AssignmentController.BASE_URL + "/" + ID)
@@ -157,5 +221,25 @@ class AssignmentControllerTest
 				.andExpect(status().isOk());
 
 		verify(assignmentService).deleteById(anyLong());
+	}
+
+	@Test
+	void deleteAssignmentNotFound() throws Exception
+	{
+		doThrow(NotFoundException.class).when(assignmentService).deleteById(anyLong());
+
+		mockMvc.perform(delete(AssignmentController.BASE_URL + "/" + ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+
+		verify(assignmentService).deleteById(anyLong());
+	}
+
+	@Test
+	void deleteAssignmentNumberFormatException() throws Exception
+	{
+		mockMvc.perform(delete(AssignmentController.BASE_URL + "/" + NO_NUMERIC_ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest());
 	}
 }

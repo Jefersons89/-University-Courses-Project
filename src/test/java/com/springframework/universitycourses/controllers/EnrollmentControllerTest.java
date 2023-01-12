@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.springframework.universitycourses.api.v1.model.EnrollmentDTO;
 import com.springframework.universitycourses.api.v1.model.EnrollmentIdDTO;
+import com.springframework.universitycourses.exceptions.NotFoundException;
 import com.springframework.universitycourses.services.EnrollmentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import java.util.Set;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -40,6 +42,8 @@ class EnrollmentControllerTest
 			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 	private static final Long STUDENT_ID = 1L;
 	private static final Long ASSIGNMENT_ID = 2L;
+	private static final String NO_STUDENT_ID = "abc";
+	private static final String NO_ASSIGNMENT_ID = "abcd";
 
 	Set<EnrollmentDTO> returnedEnrollmentSet;
 	EnrollmentDTO returnedEnrollmentDTO;
@@ -65,6 +69,7 @@ class EnrollmentControllerTest
 
 		mockMvc = MockMvcBuilders
 				.standaloneSetup(enrollmentController)
+				.setControllerAdvice(ControllerExceptionHandler.class)
 				.build();
 	}
 
@@ -104,6 +109,26 @@ class EnrollmentControllerTest
 				.andExpect(jsonPath("$.id", hasKey("assignmentId")));
 
 		verify(enrollmentService).findById(any());
+	}
+
+	@Test
+	void getEnrollmentByIdNoyFound() throws Exception
+	{
+		when(enrollmentService.findById(any())).thenThrow(NotFoundException.class);
+
+		mockMvc.perform(get(EnrollmentController.BASE_URL + "/" + STUDENT_ID + "/" + ASSIGNMENT_ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+
+		verify(enrollmentService).findById(any());
+	}
+
+	@Test
+	void getEnrollmentByIdNumberFormatException() throws Exception
+	{
+		mockMvc.perform(get(EnrollmentController.BASE_URL + "/" + NO_STUDENT_ID + "/" + NO_ASSIGNMENT_ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -155,6 +180,46 @@ class EnrollmentControllerTest
 	}
 
 	@Test
+	void updateEnrollmentNotFound() throws Exception
+	{
+		EnrollmentIdDTO enrollmentIdDTOToUpdate = new EnrollmentIdDTO(STUDENT_ID, ASSIGNMENT_ID);
+		EnrollmentDTO enrollmentDTOToUpdate = new EnrollmentDTO();
+		enrollmentDTOToUpdate.setId(enrollmentIdDTOToUpdate);
+
+		when(enrollmentService.update(any(), any())).thenThrow(NotFoundException.class);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+		String requestJson = ow.writeValueAsString(enrollmentDTOToUpdate);
+
+		mockMvc.perform(put(EnrollmentController.BASE_URL + "/" + STUDENT_ID + "/" + ASSIGNMENT_ID)
+						.contentType(APPLICATION_JSON_UTF8)
+						.content(requestJson))
+				.andExpect(status().isNotFound());
+
+		verify(enrollmentService).update(any(), any());
+	}
+
+	@Test
+	void updateEnrollmentNumberFormatException() throws Exception
+	{
+		EnrollmentIdDTO enrollmentIdDTOToUpdate = new EnrollmentIdDTO(STUDENT_ID, ASSIGNMENT_ID);
+		EnrollmentDTO enrollmentDTOToUpdate = new EnrollmentDTO();
+		enrollmentDTOToUpdate.setId(enrollmentIdDTOToUpdate);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+		String requestJson = ow.writeValueAsString(enrollmentDTOToUpdate);
+
+		mockMvc.perform(put(EnrollmentController.BASE_URL + "/" + NO_STUDENT_ID + "/" + NO_ASSIGNMENT_ID)
+						.contentType(APPLICATION_JSON_UTF8)
+						.content(requestJson))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
 	void deleteEnrollment() throws Exception
 	{
 		mockMvc.perform(delete(EnrollmentController.BASE_URL + "/" + STUDENT_ID + "/" + ASSIGNMENT_ID)
@@ -162,5 +227,25 @@ class EnrollmentControllerTest
 				.andExpect(status().isOk());
 
 		verify(enrollmentService).deleteById(any());
+	}
+
+	@Test
+	void deleteEnrollmentNotFound() throws Exception
+	{
+		doThrow(NotFoundException.class).when(enrollmentService).deleteById(any());
+
+		mockMvc.perform(delete(EnrollmentController.BASE_URL + "/" + STUDENT_ID + "/" + ASSIGNMENT_ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+
+		verify(enrollmentService).deleteById(any());
+	}
+
+	@Test
+	void deleteEnrollmentNumberFormatException() throws Exception
+	{
+		mockMvc.perform(delete(EnrollmentController.BASE_URL + "/" + NO_STUDENT_ID + "/" + NO_ASSIGNMENT_ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest());
 	}
 }

@@ -1,7 +1,6 @@
 package com.springframework.universitycourses.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,7 +26,7 @@ public class User extends BaseEntity
 	@NotBlank(message = "Last Name is mandatory")
 	private String lastName;
 
-	@Column(name = "email")
+	@Column(name = "email", unique = true)
 	@Email(message = "Email is mandatory")
 	private String email;
 

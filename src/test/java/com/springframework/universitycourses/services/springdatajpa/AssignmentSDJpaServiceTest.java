@@ -200,6 +200,7 @@ class AssignmentSDJpaServiceTest
 		assignmentToSave.setTeacherId(3L);
 
 		when(assignmentMapper.assignmentDTOToAssignment(any())).thenReturn(returnedAssignment);
+		when(assignmentRepository.findById(any())).thenReturn(Optional.ofNullable(returnedAssignment));
 		when(assignmentRepository.saveAndFlush(any())).thenReturn(returnedAssignment);
 		when(teacherRepository.findById(anyLong())).thenReturn(Optional.ofNullable(returnedTeacher));
 		when(courseRepository.findById(anyLong())).thenReturn(Optional.ofNullable(returnedCourse));

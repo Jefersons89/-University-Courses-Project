@@ -2,13 +2,10 @@ package com.springframework.universitycourses.controllers;
 
 import com.springframework.universitycourses.api.v1.model.AssignmentDTO;
 import com.springframework.universitycourses.api.v1.model.AssignmentListDTO;
-import com.springframework.universitycourses.api.v1.model.ErrorDTO;
-import com.springframework.universitycourses.exceptions.NotFoundException;
 import com.springframework.universitycourses.services.AssignmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,14 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.logging.Logger;
-
 
 @RestController
 @RequestMapping(AssignmentController.BASE_URL)
 public class AssignmentController
 {
-	private static final Logger LOGGER = Logger.getLogger(AssignmentController.class.getName());
 	public static final String BASE_URL = "/assignments";
 	private final AssignmentService assignmentService;
 

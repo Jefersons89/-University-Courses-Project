@@ -67,7 +67,7 @@ class CourseSDJpaServiceTest
 
 		assertEquals(ID, course.getId());
 
-		verify(courseRepository).findById(anyLong());
+		verify(courseRepository, times(2)).findById(anyLong());
 		verify(courseMapper).courseDTOToCourse(any());
 	}
 
@@ -165,7 +165,7 @@ class CourseSDJpaServiceTest
 		assertNotNull(course);
 		assertEquals(returnedCourse.getId(), course.getId());
 
-		verify(courseRepository).findById(anyLong());
+		verify(courseRepository, times(2)).findById(anyLong());
 		verify(courseRepository).saveAndFlush(any());
 		verify(courseMapper, times(2)).courseDTOToCourse(any());
 		verify(courseMapper).courseToCourseDTO(any());

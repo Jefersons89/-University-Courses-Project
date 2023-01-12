@@ -3,6 +3,7 @@ package com.springframework.universitycourses.services.springdatajpa;
 import com.springframework.universitycourses.api.v1.mapper.TeacherMapper;
 import com.springframework.universitycourses.api.v1.model.TeacherDTO;
 import com.springframework.universitycourses.exceptions.NotFoundException;
+import com.springframework.universitycourses.model.Assignment;
 import com.springframework.universitycourses.model.Teacher;
 import com.springframework.universitycourses.repositories.AssignmentRepository;
 import com.springframework.universitycourses.repositories.TeacherRepository;
@@ -37,7 +38,7 @@ public class TeacherSDJpaService implements TeacherService
 
 		if (teacher.isEmpty())
 		{
-			throw new NotFoundException("Teacher Not Found");
+			throw new NotFoundException("Teacher Not Found for id: " + id);
 		}
 
 		return teacher
@@ -76,6 +77,13 @@ public class TeacherSDJpaService implements TeacherService
 	@Override
 	public TeacherDTO update(final Long id, TeacherDTO object)
 	{
+		Optional<Assignment> assignment = getAssignmentRepository().findById(id);
+
+		if (assignment.isEmpty())
+		{
+			throw new NotFoundException("Teacher Not Found for id: " + id);
+		}
+
 		object.setId(id);
 		object.setAssignments(null);
 		return this.save(object);
@@ -94,7 +102,7 @@ public class TeacherSDJpaService implements TeacherService
 
 		if (teacher.isEmpty())
 		{
-			throw new NotFoundException("Teacher Not Found");
+			throw new NotFoundException("Teacher Not Found for id: " + id);
 		}
 
 		teacher.ifPresent(value -> {

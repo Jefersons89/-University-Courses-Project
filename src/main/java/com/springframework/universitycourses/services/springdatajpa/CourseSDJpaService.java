@@ -43,7 +43,7 @@ public class CourseSDJpaService implements CourseService
 
 		if (course.isEmpty())
 		{
-			throw new NotFoundException("Course Not Found");
+			throw new NotFoundException("Course Not Found for id: " + id);
 		}
 
 		return getCourseRepository().findById(id)
@@ -57,7 +57,7 @@ public class CourseSDJpaService implements CourseService
 
 		if (course.isEmpty())
 		{
-			throw new NotFoundException("Course Not Found");
+			throw new NotFoundException("Course Not Found for id: " + id);
 		}
 
 		course.ifPresent(value -> setAssignments(value, getAssignmentRepository().findAll()));
@@ -106,6 +106,13 @@ public class CourseSDJpaService implements CourseService
 	@Override
 	public CourseDTO update(final Long id, CourseDTO object)
 	{
+		Optional<Course> course = getCourseRepository().findById(id);
+
+		if (course.isEmpty())
+		{
+			throw new NotFoundException("Course Not Found for id: " + id);
+		}
+
 		object.setId(id);
 		return this.save(object);
 	}
@@ -123,7 +130,7 @@ public class CourseSDJpaService implements CourseService
 
 		if (courseOptional.isEmpty())
 		{
-			throw new NotFoundException("Course Not Found");
+			throw new NotFoundException("Course Not Found for id: " + id);
 		}
 
 		courseOptional.ifPresent(course -> {

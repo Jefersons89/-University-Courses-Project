@@ -45,11 +45,11 @@ public class DataLoader implements CommandLineRunner
 	@Override
 	public void run(final String... args) throws Exception
 	{
-		var courses = getCourseService().findAll();
-		if (courses.isEmpty())
-		{
-			loadData();
-		}
+//		var courses = getCourseService().findAll();
+		//		if (courses.isEmpty())
+		//		{
+		//			loadData();
+		//		}
 	}
 
 	private void loadData()

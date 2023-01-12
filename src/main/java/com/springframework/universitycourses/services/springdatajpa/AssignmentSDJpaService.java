@@ -72,7 +72,7 @@ public class AssignmentSDJpaService implements AssignmentService
 
 		if (assignment.isEmpty())
 		{
-			throw new NotFoundException("Assignment Not Found");
+			throw new NotFoundException("Assignment Not Found for id: " + id);
 		}
 
 		assignment.ifPresent(value -> setEnrollments(value, getEnrollmentRepository().findAll()));
@@ -119,7 +119,7 @@ public class AssignmentSDJpaService implements AssignmentService
 
 		if (course.isEmpty())
 		{
-			throw new NotFoundException("Course Not Found");
+			throw new NotFoundException("Course Not Found for id: " + object.getCourseId());
 		}
 
 		assignment.setCourse(course.get());
@@ -127,7 +127,7 @@ public class AssignmentSDJpaService implements AssignmentService
 
 		if (teacher.isEmpty())
 		{
-			throw new NotFoundException("Teacher Not Found");
+			throw new NotFoundException("Teacher Not Found for id: " + object.getTeacherId());
 		}
 
 		assignment.setTeacher(teacher.get());
@@ -156,6 +156,13 @@ public class AssignmentSDJpaService implements AssignmentService
 	@Override
 	public AssignmentDTO update(final Long id, AssignmentDTO object)
 	{
+		Optional<Assignment> assignment = getAssignmentRepository().findById(id);
+
+		if (assignment.isEmpty())
+		{
+			throw new NotFoundException("Assignment Not Found for id: " + id);
+		}
+
 		object.setId(id);
 		return this.save(object);
 	}
@@ -173,7 +180,7 @@ public class AssignmentSDJpaService implements AssignmentService
 
 		if (assignment.isEmpty())
 		{
-			throw new NotFoundException("Assignment Not Found");
+			throw new NotFoundException("Assignment Not Found for id: " + id);
 		}
 
 		assignment.ifPresent(value -> {

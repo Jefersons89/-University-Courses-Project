@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.springframework.universitycourses.api.v1.model.TeacherDTO;
+import com.springframework.universitycourses.exceptions.NotFoundException;
 import com.springframework.universitycourses.services.TeacherService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -40,6 +42,7 @@ class TeacherControllerTest
 			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 	private static final String EMAIL = "test@dummy.com";
 	private static final Long ID = 1L;
+	private static final String NO_NUMERIC_ID = "abc";
 	Set<TeacherDTO> returnedTeacherDTOSet;
 	TeacherDTO returnedTeacherDTO;
 
@@ -62,6 +65,7 @@ class TeacherControllerTest
 
 		mockMvc = MockMvcBuilders
 				.standaloneSetup(teacherController)
+				.setControllerAdvice(ControllerExceptionHandler.class)
 				.build();
 	}
 
@@ -100,6 +104,26 @@ class TeacherControllerTest
 				.andExpect(jsonPath("$.email", equalTo(EMAIL)));
 
 		verify(teacherService).findById(anyLong());
+	}
+
+	@Test
+	void getTeacherByIdNotfound() throws Exception
+	{
+		when(teacherService.findById(anyLong())).thenThrow(NotFoundException.class);
+
+		mockMvc.perform(get(TeacherController.BASE_URL + "/" + ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+
+		verify(teacherService).findById(anyLong());
+	}
+
+	@Test
+	void getTeacherByIdNumberFormatException() throws Exception
+	{
+		mockMvc.perform(get(TeacherController.BASE_URL + "/" + NO_NUMERIC_ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
@@ -149,6 +173,46 @@ class TeacherControllerTest
 	}
 
 	@Test
+	void updateTeacherNotFound() throws Exception
+	{
+		TeacherDTO teacherDTOToBeUpdated = new TeacherDTO();
+		teacherDTOToBeUpdated.setId(ID);
+		teacherDTOToBeUpdated.setEmail(EMAIL);
+
+		when(teacherService.update(anyLong(), any())).thenThrow(NotFoundException.class);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+		String requestJson = ow.writeValueAsString(teacherDTOToBeUpdated);
+
+		mockMvc.perform(put(TeacherController.BASE_URL + "/" + ID)
+						.contentType(APPLICATION_JSON_UTF8)
+						.content(requestJson))
+				.andExpect(status().isNotFound());
+
+		verify(teacherService).update(anyLong(), any());
+	}
+
+	@Test
+	void updateTeacherNumberFormatException() throws Exception
+	{
+		TeacherDTO teacherDTOToBeUpdated = new TeacherDTO();
+		teacherDTOToBeUpdated.setId(ID);
+		teacherDTOToBeUpdated.setEmail(EMAIL);
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+		String requestJson = ow.writeValueAsString(teacherDTOToBeUpdated);
+
+		mockMvc.perform(put(TeacherController.BASE_URL + "/" + NO_NUMERIC_ID)
+						.contentType(APPLICATION_JSON_UTF8)
+						.content(requestJson))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
 	void deleteTeacher() throws Exception
 	{
 		mockMvc.perform(delete(TeacherController.BASE_URL + "/" + ID)
@@ -156,5 +220,25 @@ class TeacherControllerTest
 				.andExpect(status().isOk());
 
 		verify(teacherService).deleteById(anyLong());
+	}
+
+	@Test
+	void deleteTeacherNotFound() throws Exception
+	{
+		doThrow(NotFoundException.class).when(teacherService).deleteById(anyLong());
+
+		mockMvc.perform(delete(TeacherController.BASE_URL + "/" + ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+
+		verify(teacherService).deleteById(anyLong());
+	}
+
+	@Test
+	void deleteTeacherNumberFormatException() throws Exception
+	{
+		mockMvc.perform(delete(TeacherController.BASE_URL + "/" + NO_NUMERIC_ID)
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest());
 	}
 }

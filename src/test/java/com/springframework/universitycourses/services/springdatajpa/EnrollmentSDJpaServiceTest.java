@@ -204,6 +204,7 @@ class EnrollmentSDJpaServiceTest
 	{
 		EnrollmentIdDTO enrollmentIdDTOToDelete = new EnrollmentIdDTO(ASSIGNMENT_ID, STUDENT_ID);
 		when(enrollmentIdMapper.enrollmentIdDTOToEnrollmentId(any())).thenReturn(returnedEnrollmentId);
+		when(enrollmentRepository.findById(any())).thenReturn(Optional.ofNullable(returnedEnrollment));
 
 		enrollmentSDJpaService.deleteById(enrollmentIdDTOToDelete);
 

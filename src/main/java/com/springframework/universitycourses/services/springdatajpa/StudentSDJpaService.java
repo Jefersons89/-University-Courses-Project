@@ -45,7 +45,7 @@ public class StudentSDJpaService implements StudentService
 
 		if (student.isEmpty())
 		{
-			throw new NotFoundException("Student Not Found");
+			throw new NotFoundException("Student Not Found for id: " + id);
 		}
 
 		student.ifPresent(value -> setEnrollments(getEnrollmentRepository().findAll(), value));
@@ -103,6 +103,13 @@ public class StudentSDJpaService implements StudentService
 	@Override
 	public StudentDTO update(final Long id, StudentDTO object)
 	{
+		Optional<Student> student = getStudentRepository().findById(id);
+
+		if (student.isEmpty())
+		{
+			throw new NotFoundException("Student Not Found for id: " + id);
+		}
+
 		object.setId(id);
 		return this.save(object);
 	}
@@ -120,7 +127,7 @@ public class StudentSDJpaService implements StudentService
 
 		if (student.isEmpty())
 		{
-			throw new NotFoundException("Student Not Found");
+			throw new NotFoundException("Student Not Found for id: " + id);
 		}
 
 		student.ifPresent(value -> {

@@ -48,7 +48,9 @@ public class EnrollmentSDJpaService implements EnrollmentService
 
 		if (enrollment.isEmpty())
 		{
-			throw new NotFoundException("Enrollment Not Found");
+			throw new NotFoundException(
+					"Enrollment Not Found for student with id: " + id.getStudentId() + " and \n assignment id: "
+							+ id.getAssignmentId());
 
 		}
 
@@ -106,6 +108,16 @@ public class EnrollmentSDJpaService implements EnrollmentService
 	@Override
 	public EnrollmentDTO update(final EnrollmentIdDTO id, EnrollmentDTO object)
 	{
+		Optional<Enrollment> enrollment = getEnrollmentRepository().findById(
+				getEnrollmentIdMapper().enrollmentIdDTOToEnrollmentId(id));
+
+		if (enrollment.isEmpty())
+		{
+			throw new NotFoundException(
+					"Enrollment Not Found for student with id: " + id.getStudentId() + " and \n assignment id: "
+							+ id.getAssignmentId());
+		}
+
 		object.setId(id);
 		return this.save(object);
 	}
@@ -124,7 +136,9 @@ public class EnrollmentSDJpaService implements EnrollmentService
 
 		if (enrollment.isEmpty())
 		{
-			throw new NotFoundException("Enrollment Not Found");
+			throw new NotFoundException(
+					"Enrollment Not Found for student with id: " + id.getStudentId() + " and \n assignment id: "
+							+ id.getAssignmentId());
 		}
 
 		getEnrollmentRepository().deleteById(enrollmentId);
