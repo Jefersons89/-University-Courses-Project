@@ -16,7 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.security.RolesAllowed;
+import javax.validation.Valid;
 
+
+@RolesAllowed({ "USER", "ADMIN" })
 @RestController
 @RequestMapping(AssignmentController.BASE_URL)
 public class AssignmentController
@@ -51,14 +55,14 @@ public class AssignmentController
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public AssignmentDTO createNewAssignment(@RequestBody AssignmentDTO assignmentDTO)
+	public AssignmentDTO createNewAssignment(@RequestBody @Valid AssignmentDTO assignmentDTO)
 	{
 		return getAssignmentService().createNew(assignmentDTO);
 	}
 
 	@PutMapping({ "/{assignmentId}" })
 	@ResponseStatus(HttpStatus.OK)
-	public AssignmentDTO updateAssignment(@PathVariable Long assignmentId, @RequestBody AssignmentDTO assignmentDTO)
+	public AssignmentDTO updateAssignment(@PathVariable Long assignmentId, @RequestBody @Valid AssignmentDTO assignmentDTO)
 	{
 		return getAssignmentService().update(assignmentId, assignmentDTO);
 	}

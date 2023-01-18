@@ -31,5 +31,10 @@ public class TeacherDTO
 	@Email(message = "Email is mandatory")
 	private String email;
 
+	@NotBlank(message = "Password id mandatory")
+	@NotNull(message = "Password id mandatory")
+	private String password;
+
+	private Set<String> roles;
 	private Set<AssignmentDTO> assignments;
 }

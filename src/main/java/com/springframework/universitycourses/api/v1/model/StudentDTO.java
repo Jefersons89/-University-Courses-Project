@@ -33,9 +33,14 @@ public class StudentDTO
 	@NotNull(message = "Last Name is mandatory")
 	private String email;
 
+	@NotBlank(message = "Password id mandatory")
+	@NotNull(message = "Password id mandatory")
+	private String password;
+
 	@NotNull(message = "Enrollment Year is mandatory")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
 	private Date enrollmentYear;
 
+	private Set<String> roles;
 	private Set<EnrollmentDTO> enrollments;
 }

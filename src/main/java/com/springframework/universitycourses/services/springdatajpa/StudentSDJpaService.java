@@ -5,15 +5,18 @@ import com.springframework.universitycourses.api.v1.model.StudentDTO;
 import com.springframework.universitycourses.exceptions.NotFoundException;
 import com.springframework.universitycourses.model.Assignment;
 import com.springframework.universitycourses.model.Enrollment;
+import com.springframework.universitycourses.model.Role;
 import com.springframework.universitycourses.model.Student;
 import com.springframework.universitycourses.repositories.AssignmentRepository;
 import com.springframework.universitycourses.repositories.EnrollmentRepository;
+import com.springframework.universitycourses.repositories.RoleRepository;
 import com.springframework.universitycourses.repositories.StudentRepository;
 import com.springframework.universitycourses.services.StudentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -31,15 +34,20 @@ public class StudentSDJpaService implements StudentService
 	private final StudentRepository studentRepository;
 	private final EnrollmentRepository enrollmentRepository;
 	private final AssignmentRepository assignmentRepository;
+	private final RoleRepository roleRepository;
 	private final StudentMapper studentMapper;
+	private final BCryptPasswordEncoder passwordEncoder;
 
 	public StudentSDJpaService(final StudentRepository studentRepository, final EnrollmentRepository enrollmentRepository,
-			final AssignmentRepository assignmentRepository, final StudentMapper studentMapper)
+			final AssignmentRepository assignmentRepository, final RoleRepository roleRepository, final StudentMapper studentMapper,
+			final BCryptPasswordEncoder passwordEncoder)
 	{
 		this.studentRepository = studentRepository;
 		this.enrollmentRepository = enrollmentRepository;
 		this.assignmentRepository = assignmentRepository;
+		this.roleRepository = roleRepository;
 		this.studentMapper = studentMapper;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Override
@@ -67,7 +75,6 @@ public class StudentSDJpaService implements StudentService
 
 		Page<Student> students = getStudentRepository().findAll(sortedByFirstName);
 
-		//		List<Student> students = getStudentRepository().findAll();
 		students.forEach(student -> setEnrollments(getEnrollmentRepository().findAll(), student));
 
 		return students.stream()
@@ -99,8 +106,23 @@ public class StudentSDJpaService implements StudentService
 	public StudentDTO save(final StudentDTO object)
 	{
 		object.setEnrollments(new HashSet<>());
+
+		Student studentToSave = getStudentMapper().studentDTOToStudent(object);
+
+		if (!object.getRoles().isEmpty())
+		{
+			Set<Role> roles = new HashSet<>();
+			object.getRoles().forEach(role -> {
+				Optional<Role> roleOptional = roleRepository.findByName(role);
+				roleOptional.ifPresent(roles::add);
+			});
+			studentToSave.setRoles(roles);
+		}
+
+		studentToSave.setPassword(passwordEncoder.encode(studentToSave.getPassword()));
+
 		return getStudentMapper().studentToStudentDTO(
-				getStudentRepository().saveAndFlush(getStudentMapper().studentDTOToStudent(object)));
+				getStudentRepository().saveAndFlush(studentToSave));
 	}
 
 	@Override

@@ -92,7 +92,6 @@ public class AssignmentSDJpaService implements AssignmentService
 
 		Page<Assignment> assignments = getAssignmentRepository().findAll(sortedByTitle);
 
-		//		List<Assignment> assignments = getAssignmentRepository().findAll();
 		assignments.forEach(assignment -> setEnrollments(assignment, getEnrollmentRepository().findAll()));
 
 		return assignments.stream()

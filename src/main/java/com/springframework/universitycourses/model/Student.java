@@ -30,10 +30,10 @@ public class Student extends User
 	private transient Set<Enrollment> enrollments = new HashSet<>();
 
 	@Builder
-	public Student(final Long id, final String firstName, final String lastName, final String email, final Date enrollmentYear,
-			final Set<Enrollment> enrollments)
+	public Student(final Long id, final String firstName, final String lastName, final String email, final String password,
+			final Set<Role> roles, final Date enrollmentYear, final Set<Enrollment> enrollments)
 	{
-		super(id, firstName, lastName, email);
+		super(id, firstName, lastName, email, password, roles);
 		this.enrollmentYear = enrollmentYear;
 		this.enrollments = enrollments;
 	}

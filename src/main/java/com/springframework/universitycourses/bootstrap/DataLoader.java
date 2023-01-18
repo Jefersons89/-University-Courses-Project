@@ -4,19 +4,25 @@ import com.springframework.universitycourses.model.Assignment;
 import com.springframework.universitycourses.model.Course;
 import com.springframework.universitycourses.model.Enrollment;
 import com.springframework.universitycourses.model.EnrollmentId;
+import com.springframework.universitycourses.model.Role;
 import com.springframework.universitycourses.model.Student;
 import com.springframework.universitycourses.model.Teacher;
+import com.springframework.universitycourses.repositories.StudentRepository;
+import com.springframework.universitycourses.repositories.TeacherRepository;
 import com.springframework.universitycourses.services.AssignmentService;
 import com.springframework.universitycourses.services.CourseService;
 import com.springframework.universitycourses.services.EnrollmentService;
+import com.springframework.universitycourses.services.RoleService;
 import com.springframework.universitycourses.services.StudentService;
 import com.springframework.universitycourses.services.TeacherService;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,16 +36,26 @@ public class DataLoader implements CommandLineRunner
 	private final TeacherService teacherService;
 	private final StudentService studentService;
 	private final EnrollmentService enrollmentService;
+	private final RoleService roleService;
+	private final TeacherRepository teacherRepository;
+	private final StudentRepository studentRepository;
+	private final BCryptPasswordEncoder passwordEncoder;
 
 	public DataLoader(final CourseService courseService, final AssignmentService assignmentService,
 			final TeacherService teacherService,
-			final StudentService studentService, final EnrollmentService enrollmentService)
+			final StudentService studentService, final EnrollmentService enrollmentService, final RoleService roleService,
+			final TeacherRepository teacherRepository, final StudentRepository studentRepository,
+			final BCryptPasswordEncoder passwordEncoder)
 	{
 		this.courseService = courseService;
 		this.assignmentService = assignmentService;
 		this.teacherService = teacherService;
 		this.studentService = studentService;
 		this.enrollmentService = enrollmentService;
+		this.roleService = roleService;
+		this.teacherRepository = teacherRepository;
+		this.studentRepository = studentRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Override
@@ -139,11 +155,28 @@ public class DataLoader implements CommandLineRunner
 
 		LOGGER.log(Level.INFO, "Courses Loaded...");
 
+		Role teacher =
+				Role.builder()
+						.name("TEACHER")
+						.build();
+
+		Role student =
+				Role.builder()
+						.name("STUDENT")
+						.build();
+
+		Role admin =
+				Role.builder()
+						.name("ADMIN")
+						.build();
+
 		Teacher jacobArcila =
 				Teacher.builder()
 						.firstName("Jacob")
 						.lastName("Arcila")
 						.email("jacob@gmail.com")
+						.password("123")
+						.roles(new HashSet<>())
 						.assignments(new HashSet<>())
 						.build();
 
@@ -157,6 +190,8 @@ public class DataLoader implements CommandLineRunner
 						.firstName("Steven")
 						.lastName("Gonzales")
 						.email("stevenGonzales@gmail.com")
+						.password("321")
+						.roles(new HashSet<>())
 						.assignments(new HashSet<>())
 						.build();
 
@@ -170,9 +205,10 @@ public class DataLoader implements CommandLineRunner
 						.firstName("Hernando")
 						.lastName("Morales")
 						.email("hernandoMorales@gmail.com")
+						.password("456")
+						.roles(new HashSet<>())
 						.assignments(new HashSet<>())
 						.build();
-
 
 		hernandoMorales.getAssignments().add(physics);
 		hernandoMorales.getAssignments().add(programing);
@@ -186,8 +222,10 @@ public class DataLoader implements CommandLineRunner
 						.firstName("Jeferson")
 						.lastName("Salazar")
 						.email("jefersonsalazar@gmail.com")
+						.password(passwordEncoder.encode("654"))
 						.enrollmentYear(new GregorianCalendar(2020, Calendar.FEBRUARY, 11).getTime())
 						.enrollments(new HashSet<>())
+						.roles(new HashSet<>())
 						.build();
 
 		Student hayderBedoya =
@@ -195,8 +233,10 @@ public class DataLoader implements CommandLineRunner
 						.firstName("Hayder")
 						.lastName("Bedoya")
 						.email("hayderBedoya@gmail.com")
+						.password("789")
 						.enrollmentYear(new GregorianCalendar(2021, Calendar.MARCH, 20).getTime())
 						.enrollments(new HashSet<>())
+						.roles(new HashSet<>())
 						.build();
 
 		LOGGER.log(Level.INFO, "Students Loaded...");
@@ -268,6 +308,10 @@ public class DataLoader implements CommandLineRunner
 		getAssignmentService().save(physics);
 		getAssignmentService().save(programing);
 
+		getRoleService().save(teacher);
+		getRoleService().save(student);
+		getRoleService().save(admin);
+
 		getStudentService().save(jefersonSalazar);
 		getStudentService().save(hayderBedoya);
 
@@ -275,6 +319,32 @@ public class DataLoader implements CommandLineRunner
 		getEnrollmentService().save(enrollment2);
 		getEnrollmentService().save(enrollment3);
 		getEnrollmentService().save(enrollment4);
+
+		Optional<Teacher> teacher1 = teacherRepository.findById(jacobArcila.getId());
+		teacher1.ifPresent(t -> {
+			t.getRoles().add(teacher);
+			teacherRepository.save(t);
+		});
+		Optional<Teacher> teacher2 = teacherRepository.findById(hernandoMorales.getId());
+		teacher2.ifPresent(t -> {
+			t.getRoles().add(teacher);
+			teacherRepository.save(t);
+		});
+		Optional<Teacher> teacher3 = teacherRepository.findById(stevenGonzales.getId());
+		teacher3.ifPresent(t -> {
+			t.getRoles().add(teacher);
+			teacherRepository.save(t);
+		});
+		Optional<Student> student1 = studentRepository.findById(jefersonSalazar.getId());
+		student1.ifPresent(s -> {
+			s.getRoles().add(student);
+			studentRepository.save(s);
+		});
+		Optional<Student> student2 = studentRepository.findById(hayderBedoya.getId());
+		student2.ifPresent(s -> {
+			s.getRoles().add(student);
+			studentRepository.save(s);
+		});
 	}
 
 	public CourseService getCourseService()
@@ -300,5 +370,10 @@ public class DataLoader implements CommandLineRunner
 	public EnrollmentService getEnrollmentService()
 	{
 		return enrollmentService;
+	}
+
+	public RoleService getRoleService()
+	{
+		return roleService;
 	}
 }

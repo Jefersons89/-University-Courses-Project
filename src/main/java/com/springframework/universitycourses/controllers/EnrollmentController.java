@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping(EnrollmentController.BASE_URL)
@@ -53,14 +55,14 @@ public class EnrollmentController
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public EnrollmentDTO createNewEnrollment(@RequestBody EnrollmentDTO enrollmentDTO)
+	public EnrollmentDTO createNewEnrollment(@RequestBody @Valid EnrollmentDTO enrollmentDTO)
 	{
 		return getEnrollmentService().createNew(enrollmentDTO);
 	}
 
 	@PutMapping({ "/{studentId}/{assignmentId}" })
 	@ResponseStatus(HttpStatus.OK)
-	public EnrollmentDTO updateEnrollment(@PathVariable Long studentId, @PathVariable Long assignmentId,
+	public EnrollmentDTO updateEnrollment(@PathVariable Long studentId, @PathVariable @Valid Long assignmentId,
 			@RequestBody EnrollmentDTO enrollmentDTO)
 	{
 		EnrollmentIdDTO enrollmentIdDTO = new EnrollmentIdDTO(studentId, assignmentId);

@@ -3,14 +3,17 @@ package com.springframework.universitycourses.services.springdatajpa;
 import com.springframework.universitycourses.api.v1.mapper.TeacherMapper;
 import com.springframework.universitycourses.api.v1.model.TeacherDTO;
 import com.springframework.universitycourses.exceptions.NotFoundException;
+import com.springframework.universitycourses.model.Role;
 import com.springframework.universitycourses.model.Teacher;
 import com.springframework.universitycourses.repositories.AssignmentRepository;
+import com.springframework.universitycourses.repositories.RoleRepository;
 import com.springframework.universitycourses.repositories.TeacherRepository;
 import com.springframework.universitycourses.services.TeacherService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -24,14 +27,18 @@ public class TeacherSDJpaService implements TeacherService
 {
 	private final TeacherRepository teacherRepository;
 	private final AssignmentRepository assignmentRepository;
+	private final RoleRepository roleRepository;
 	private final TeacherMapper teacherMapper;
+	private final BCryptPasswordEncoder passwordEncoder;
 
 	public TeacherSDJpaService(final TeacherRepository teacherRepository, final AssignmentRepository assignmentRepository,
-			final TeacherMapper teacherMapper)
+			final RoleRepository roleRepository, final TeacherMapper teacherMapper, final BCryptPasswordEncoder passwordEncoder)
 	{
 		this.teacherRepository = teacherRepository;
 		this.assignmentRepository = assignmentRepository;
+		this.roleRepository = roleRepository;
 		this.teacherMapper = teacherMapper;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Override
@@ -71,10 +78,24 @@ public class TeacherSDJpaService implements TeacherService
 	}
 
 	@Override
-	public TeacherDTO save(final TeacherDTO object)
+	public TeacherDTO save(final TeacherDTO teacherDto)
 	{
+		Teacher teacher = getTeacherMapper().teacherDTOToTeacher(teacherDto);
+
+		if (!teacherDto.getRoles().isEmpty())
+		{
+			Set<Role> roles = new HashSet<>();
+			teacherDto.getRoles().forEach(role -> {
+				Optional<Role> roleOptional = roleRepository.findByName(role);
+				roleOptional.ifPresent(roles::add);
+			});
+			teacher.setRoles(roles);
+		}
+
+		teacher.setPassword(passwordEncoder.encode(teacher.getPassword()));
+
 		return getTeacherMapper().teacherToTeacherDTO(
-				getTeacherRepository().saveAndFlush(getTeacherMapper().teacherDTOToTeacher(object)));
+				getTeacherRepository().saveAndFlush(teacher));
 	}
 
 	public Teacher save(final Teacher object)

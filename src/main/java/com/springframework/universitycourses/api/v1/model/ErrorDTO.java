@@ -13,6 +13,5 @@ import lombok.Setter;
 public class ErrorDTO
 {
 	private Integer errorCode;
-	private String error;
 	private String errorMessage;
 }

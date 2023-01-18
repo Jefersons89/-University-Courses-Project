@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping(StudentController.BASE_URL)
@@ -51,14 +53,14 @@ public class StudentController
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public StudentDTO createNewStudent(@RequestBody StudentDTO studentDTO)
+	public StudentDTO createNewStudent(@RequestBody @Valid StudentDTO studentDTO)
 	{
 		return getStudentService().createNew(studentDTO);
 	}
 
 	@PutMapping({ "/{studentId}" })
 	@ResponseStatus(HttpStatus.OK)
-	public StudentDTO updateStudent(@PathVariable Long studentId, @RequestBody StudentDTO studentDTO)
+	public StudentDTO updateStudent(@PathVariable Long studentId, @RequestBody @Valid StudentDTO studentDTO)
 	{
 		return getStudentService().update(studentId, studentDTO);
 	}

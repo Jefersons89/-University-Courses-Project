@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping(CourseController.BASE_URL)
@@ -51,14 +53,14 @@ public class CourseController
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public CourseDTO createNewCourse(@RequestBody CourseDTO courseDTO)
+	public CourseDTO createNewCourse(@RequestBody @Valid CourseDTO courseDTO)
 	{
 		return getCourseService().createNew(courseDTO);
 	}
 
 	@PutMapping({ "/{courseId}" })
 	@ResponseStatus(HttpStatus.OK)
-	public CourseDTO updateCourse(@PathVariable Long courseId, @RequestBody CourseDTO courseDTO)
+	public CourseDTO updateCourse(@PathVariable Long courseId, @RequestBody @Valid CourseDTO courseDTO)
 	{
 		return getCourseService().update(courseId, courseDTO);
 	}

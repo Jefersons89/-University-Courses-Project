@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping(TeacherController.BASE_URL)
@@ -51,14 +53,14 @@ public class TeacherController
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public TeacherDTO createNewTeacher(@RequestBody TeacherDTO teacherDTO)
+	public TeacherDTO createNewTeacher(@RequestBody @Valid TeacherDTO teacherDTO)
 	{
 		return getTeacherService().createNew(teacherDTO);
 	}
 
 	@PutMapping({ "/{teacherId}" })
 	@ResponseStatus(HttpStatus.OK)
-	public TeacherDTO updateTeacher(@PathVariable Long teacherId, @RequestBody TeacherDTO teacherDTO)
+	public TeacherDTO updateTeacher(@PathVariable Long teacherId, @RequestBody @Valid TeacherDTO teacherDTO)
 	{
 		return getTeacherService().update(teacherId, teacherDTO);
 	}
