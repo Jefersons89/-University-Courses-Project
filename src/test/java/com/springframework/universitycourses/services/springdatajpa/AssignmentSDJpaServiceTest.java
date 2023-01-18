@@ -16,6 +16,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -114,7 +117,9 @@ class AssignmentSDJpaServiceTest
 		List<Assignment> assignmentTestSet = new ArrayList<>();
 		assignmentTestSet.add(returnedAssignment);
 
-		when(assignmentRepository.findAll()).thenReturn(assignmentTestSet);
+		final Page<Assignment> assignmentTestPage = new PageImpl<>(assignmentTestSet);
+
+		when(assignmentRepository.findAll((Pageable) any())).thenReturn(assignmentTestPage);
 		when(enrollmentRepository.findAll()).thenReturn(Collections.emptyList());
 		when(assignmentMapper.assignmentToAssignmentDTO(any())).thenReturn(returnedAssignmentDTO);
 
@@ -122,7 +127,7 @@ class AssignmentSDJpaServiceTest
 
 		assertEquals(1, assignmentTest.size());
 
-		verify(assignmentRepository).findAll();
+		verify(assignmentRepository).findAll((Pageable) any());
 		verify(enrollmentRepository).findAll();
 		verify(assignmentMapper).assignmentToAssignmentDTO(any());
 	}

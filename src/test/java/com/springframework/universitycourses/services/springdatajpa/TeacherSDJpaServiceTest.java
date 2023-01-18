@@ -10,6 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,6 +35,8 @@ import static org.mockito.Mockito.when;
 class TeacherSDJpaServiceTest
 {
 	private static final String EMAIL = "test@dummy.com";
+	private static final String PASSWORD = "123";
+	private static final String ENCODED_PASSWORD = "TestEncoded";
 	private static final Long ID = 1L;
 	Teacher returnedTeacher;
 	TeacherDTO returnedTeacherDTO;
@@ -40,13 +47,16 @@ class TeacherSDJpaServiceTest
 	@Mock
 	TeacherMapper teacherMapper;
 
+	@Mock
+	BCryptPasswordEncoder passwordEncoder;
+
 	@InjectMocks
 	TeacherSDJpaService teacherSDJpaService;
 
 	@BeforeEach
 	void setUp()
 	{
-		returnedTeacher = Teacher.builder().id(ID).email(EMAIL).assignments(new HashSet<>()).build();
+		returnedTeacher = Teacher.builder().id(ID).email(EMAIL).password(PASSWORD).assignments(new HashSet<>()).build();
 
 		returnedTeacherDTO = new TeacherDTO();
 		returnedTeacher.setId(ID);
@@ -75,14 +85,16 @@ class TeacherSDJpaServiceTest
 		List<Teacher> teacherList = new ArrayList<>();
 		teacherList.add(returnedTeacher);
 
-		when(teacherRepository.findAll()).thenReturn(teacherList);
+		final Page<Teacher> teacherListPage = new PageImpl<>(teacherList);
+
+		when(teacherRepository.findAll((Pageable) any())).thenReturn(teacherListPage);
 		when(teacherMapper.teacherToTeacherDTO(any())).thenReturn(returnedTeacherDTO);
 
 		Set<TeacherDTO> teacherDTOSet = teacherSDJpaService.findAll();
 
 		assertEquals(1, teacherDTOSet.size());
 
-		verify(teacherRepository).findAll();
+		verify(teacherRepository).findAll((Pageable) any());
 		verify(teacherMapper).teacherToTeacherDTO(any());
 	}
 
@@ -96,6 +108,7 @@ class TeacherSDJpaServiceTest
 		when(teacherRepository.saveAndFlush(any())).thenReturn(returnedTeacher);
 		when(teacherMapper.teacherDTOToTeacher(any())).thenReturn(returnedTeacher);
 		when(teacherMapper.teacherToTeacherDTO(any())).thenReturn(returnedTeacherDTO);
+		when(passwordEncoder.encode(anyString())).thenReturn(ENCODED_PASSWORD);
 
 		Teacher teacher = teacherMapper.teacherDTOToTeacher(teacherSDJpaService.createNew(teacherDTOToSave));
 
@@ -105,6 +118,7 @@ class TeacherSDJpaServiceTest
 		verify(teacherRepository).saveAndFlush(any());
 		verify(teacherMapper).teacherToTeacherDTO(any());
 		verify(teacherMapper, times(2)).teacherDTOToTeacher(any());
+		verify(passwordEncoder).encode(anyString());
 	}
 
 	@Test
@@ -117,6 +131,7 @@ class TeacherSDJpaServiceTest
 		when(teacherRepository.saveAndFlush(any())).thenReturn(returnedTeacher);
 		when(teacherMapper.teacherDTOToTeacher(any())).thenReturn(returnedTeacher);
 		when(teacherMapper.teacherToTeacherDTO(any())).thenReturn(returnedTeacherDTO);
+		when(passwordEncoder.encode(anyString())).thenReturn(ENCODED_PASSWORD);
 
 		Teacher teacher = teacherMapper.teacherDTOToTeacher(teacherSDJpaService.save(teacherDTOToSave));
 
@@ -126,6 +141,7 @@ class TeacherSDJpaServiceTest
 		verify(teacherRepository).saveAndFlush(any());
 		verify(teacherMapper).teacherToTeacherDTO(any());
 		verify(teacherMapper, times(2)).teacherDTOToTeacher(any());
+		verify(passwordEncoder).encode(anyString());
 	}
 
 	@Test
@@ -153,6 +169,7 @@ class TeacherSDJpaServiceTest
 		when(teacherRepository.saveAndFlush(any())).thenReturn(returnedTeacher);
 		when(teacherMapper.teacherDTOToTeacher(any())).thenReturn(returnedTeacher);
 		when(teacherMapper.teacherToTeacherDTO(any())).thenReturn(returnedTeacherDTO);
+		when(passwordEncoder.encode(anyString())).thenReturn(ENCODED_PASSWORD);
 
 		Teacher teacher = teacherMapper.teacherDTOToTeacher(teacherSDJpaService.update(ID, teacherDTOToSave));
 
@@ -162,6 +179,7 @@ class TeacherSDJpaServiceTest
 		verify(teacherRepository).saveAndFlush(any());
 		verify(teacherMapper).teacherToTeacherDTO(any());
 		verify(teacherMapper, times(2)).teacherDTOToTeacher(any());
+		verify(passwordEncoder).encode(anyString());
 	}
 
 	@Test

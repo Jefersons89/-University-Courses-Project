@@ -17,6 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,8 +44,12 @@ class StudentControllerTest
 	public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 	private static final String EMAIL = "test@dummy.com";
-	private static final Long ID = 1L;
 	private static final String NO_NUMERIC_ID = "abc";
+	private static final String FIRST_NAME = "TestName";
+	private static final String LAST_NAME = "TestLastName";
+	private static final String PASSWORD = "123";
+	private static final Date ENROLLMENT_YEAR = new GregorianCalendar(2023, Calendar.SEPTEMBER, 8).getTime();
+	private static final Long ID = 1L;
 	Set<StudentDTO> returnedStudentDTOSet;
 	StudentDTO returnedStudentDTO;
 
@@ -131,7 +138,11 @@ class StudentControllerTest
 	{
 		StudentDTO studentDTOToCreate = new StudentDTO();
 		studentDTOToCreate.setId(ID);
+		studentDTOToCreate.setFirstName(FIRST_NAME);
+		studentDTOToCreate.setLastName(LAST_NAME);
 		studentDTOToCreate.setEmail(EMAIL);
+		studentDTOToCreate.setPassword(PASSWORD);
+		studentDTOToCreate.setEnrollmentYear(ENROLLMENT_YEAR);
 
 		when(studentService.createNew(any())).thenReturn(returnedStudentDTO);
 
@@ -154,7 +165,11 @@ class StudentControllerTest
 	{
 		StudentDTO studentDTOToUpdate = new StudentDTO();
 		studentDTOToUpdate.setId(ID);
+		studentDTOToUpdate.setFirstName(FIRST_NAME);
+		studentDTOToUpdate.setLastName(LAST_NAME);
 		studentDTOToUpdate.setEmail(EMAIL);
+		studentDTOToUpdate.setPassword(PASSWORD);
+		studentDTOToUpdate.setEnrollmentYear(ENROLLMENT_YEAR);
 
 		when(studentService.update(anyLong(), any())).thenReturn(returnedStudentDTO);
 
@@ -177,7 +192,11 @@ class StudentControllerTest
 	{
 		StudentDTO studentDTOToUpdate = new StudentDTO();
 		studentDTOToUpdate.setId(ID);
+		studentDTOToUpdate.setFirstName(FIRST_NAME);
+		studentDTOToUpdate.setLastName(LAST_NAME);
 		studentDTOToUpdate.setEmail(EMAIL);
+		studentDTOToUpdate.setPassword(PASSWORD);
+		studentDTOToUpdate.setEnrollmentYear(ENROLLMENT_YEAR);
 
 		when(studentService.update(anyLong(), any())).thenThrow(NotFoundException.class);
 

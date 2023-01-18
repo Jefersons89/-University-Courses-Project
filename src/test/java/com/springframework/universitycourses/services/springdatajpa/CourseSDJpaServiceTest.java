@@ -11,6 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -91,14 +94,16 @@ class CourseSDJpaServiceTest
 		List<Course> courseList = new ArrayList<>();
 		courseList.add(returnedCourse);
 
-		when(courseRepository.findAll()).thenReturn(courseList);
+		final Page<Course> courseListPage = new PageImpl<>(courseList);
+
+		when(courseRepository.findAll((Pageable) any())).thenReturn(courseListPage);
 		when(courseMapper.courseToCourseDTO(any())).thenReturn(returnedCourseDTO);
 
 		Set<CourseDTO> courseDTOSet = courseSDJpaService.findAll();
 
 		assertEquals(1, courseDTOSet.size());
 
-		verify(courseRepository).findAll();
+		verify(courseRepository).findAll((Pageable) any());
 		verify(courseMapper).courseToCourseDTO(any());
 	}
 

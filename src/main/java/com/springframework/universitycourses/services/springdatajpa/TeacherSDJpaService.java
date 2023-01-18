@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -82,7 +83,7 @@ public class TeacherSDJpaService implements TeacherService
 	{
 		Teacher teacher = getTeacherMapper().teacherDTOToTeacher(teacherDto);
 
-		if (!teacherDto.getRoles().isEmpty())
+		if (Objects.nonNull(teacherDto.getRoles()) && !teacherDto.getRoles().isEmpty())
 		{
 			Set<Role> roles = new HashSet<>();
 			teacherDto.getRoles().forEach(role -> {

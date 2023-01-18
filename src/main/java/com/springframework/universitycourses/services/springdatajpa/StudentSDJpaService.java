@@ -109,7 +109,7 @@ public class StudentSDJpaService implements StudentService
 
 		Student studentToSave = getStudentMapper().studentDTOToStudent(object);
 
-		if (!object.getRoles().isEmpty())
+		if (Objects.nonNull(object.getRoles()) && !object.getRoles().isEmpty())
 		{
 			Set<Role> roles = new HashSet<>();
 			object.getRoles().forEach(role -> {

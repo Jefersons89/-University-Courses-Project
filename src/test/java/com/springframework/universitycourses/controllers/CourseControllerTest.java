@@ -41,8 +41,10 @@ class CourseControllerTest
 	public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 	private static final String TITLE = "TestCourse";
-	private static final Long ID = 1L;
 	private static final String NO_NUMERIC_ID = "abc";
+	private static final String DESCRIPTION = "TestDescription";
+	private static final Long CREDIT = 125L;
+	private static final Long ID = 1L;
 	Set<CourseDTO> returnedCourseDTOSet;
 	CourseDTO returnedCourseDTO;
 
@@ -132,6 +134,8 @@ class CourseControllerTest
 		CourseDTO courseDTOToCreate = new CourseDTO();
 		courseDTOToCreate.setId(ID);
 		courseDTOToCreate.setTitle(TITLE);
+		courseDTOToCreate.setDescription(DESCRIPTION);
+		courseDTOToCreate.setCredit(CREDIT);
 
 		when(courseService.createNew(any())).thenReturn(returnedCourseDTO);
 
@@ -155,6 +159,8 @@ class CourseControllerTest
 		CourseDTO courseDTOToUpdate = new CourseDTO();
 		courseDTOToUpdate.setId(ID);
 		courseDTOToUpdate.setTitle(TITLE);
+		courseDTOToUpdate.setDescription(DESCRIPTION);
+		courseDTOToUpdate.setCredit(CREDIT);
 
 		when(courseService.update(anyLong(), any())).thenReturn(returnedCourseDTO);
 
@@ -178,6 +184,8 @@ class CourseControllerTest
 		CourseDTO courseDTOToUpdate = new CourseDTO();
 		courseDTOToUpdate.setId(ID);
 		courseDTOToUpdate.setTitle(TITLE);
+		courseDTOToUpdate.setDescription(DESCRIPTION);
+		courseDTOToUpdate.setCredit(CREDIT);
 
 		when(courseService.update(anyLong(), any())).thenThrow(NotFoundException.class);
 

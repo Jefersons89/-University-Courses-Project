@@ -41,8 +41,12 @@ class AssignmentControllerTest
 	public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 	private static final String TITLE = "TestAssignment";
-	private static final Long ID = 1L;
 	private static final String NO_NUMERIC_ID = "abc";
+	private static final String DESCRIPTION = "TestDescription";
+	private static final Long POINTS = 20L;
+	private static final Long COURSE_ID = 2L;
+	private static final Long TEACHER_ID = 3L;
+	private static final Long ID = 1L;
 	Set<AssignmentDTO> returnedAssignmentDTOSet;
 	AssignmentDTO returnedAssignmentDTO;
 
@@ -133,6 +137,10 @@ class AssignmentControllerTest
 		AssignmentDTO assignmentDTOToCreate = new AssignmentDTO();
 		assignmentDTOToCreate.setId(ID);
 		assignmentDTOToCreate.setTitle(TITLE);
+		assignmentDTOToCreate.setDescription(DESCRIPTION);
+		assignmentDTOToCreate.setPoints(POINTS);
+		assignmentDTOToCreate.setCourseId(COURSE_ID);
+		assignmentDTOToCreate.setTeacherId(TEACHER_ID);
 
 		when(assignmentService.createNew(any())).thenReturn(returnedAssignmentDTO);
 
@@ -156,6 +164,10 @@ class AssignmentControllerTest
 		AssignmentDTO assignmentDTOToUpdated = new AssignmentDTO();
 		assignmentDTOToUpdated.setId(ID);
 		assignmentDTOToUpdated.setTitle(TITLE);
+		assignmentDTOToUpdated.setDescription(DESCRIPTION);
+		assignmentDTOToUpdated.setPoints(POINTS);
+		assignmentDTOToUpdated.setCourseId(COURSE_ID);
+		assignmentDTOToUpdated.setTeacherId(TEACHER_ID);
 
 		when(assignmentService.update(anyLong(), any())).thenReturn(returnedAssignmentDTO);
 
@@ -179,6 +191,10 @@ class AssignmentControllerTest
 		AssignmentDTO assignmentDTOToUpdated = new AssignmentDTO();
 		assignmentDTOToUpdated.setId(ID);
 		assignmentDTOToUpdated.setTitle(TITLE);
+		assignmentDTOToUpdated.setDescription(DESCRIPTION);
+		assignmentDTOToUpdated.setPoints(POINTS);
+		assignmentDTOToUpdated.setCourseId(COURSE_ID);
+		assignmentDTOToUpdated.setTeacherId(TEACHER_ID);
 
 		when(assignmentService.update(anyLong(), any())).thenThrow(NotFoundException.class);
 

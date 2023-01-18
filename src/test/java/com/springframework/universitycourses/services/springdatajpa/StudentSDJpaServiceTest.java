@@ -11,6 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,6 +36,8 @@ import static org.mockito.Mockito.when;
 class StudentSDJpaServiceTest
 {
 	private static final String EMAIL = "test@dummy.com";
+	private static final String PASSWORD = "123";
+	private static final String ENCODED_PASSWORD = "TestEncoded";
 	private static final Long ID = 1L;
 	Student returnedStudent;
 	StudentDTO returnedStudentDTO;
@@ -44,13 +51,16 @@ class StudentSDJpaServiceTest
 	@Mock
 	StudentMapper studentMapper;
 
+	@Mock
+	BCryptPasswordEncoder passwordEncoder;
+
 	@InjectMocks
 	StudentSDJpaService studentSDJpaService;
 
 	@BeforeEach
 	void setUp()
 	{
-		returnedStudent = Student.builder().id(ID).email(EMAIL).build();
+		returnedStudent = Student.builder().id(ID).email(EMAIL).password(PASSWORD).build();
 
 		returnedStudentDTO = new StudentDTO();
 		returnedStudentDTO.setId(ID);
@@ -81,7 +91,9 @@ class StudentSDJpaServiceTest
 		List<Student> studentList = new ArrayList<>();
 		studentList.add(returnedStudent);
 
-		when(studentRepository.findAll()).thenReturn(studentList);
+		final Page<Student> studentListPage = new PageImpl<>(studentList);
+
+		when(studentRepository.findAll((Pageable) any())).thenReturn(studentListPage);
 		when(enrollmentRepository.findAll()).thenReturn(Collections.emptyList());
 		when(studentMapper.studentToStudentDTO(any())).thenReturn(returnedStudentDTO);
 
@@ -89,7 +101,7 @@ class StudentSDJpaServiceTest
 
 		assertEquals(1, studentDTOSet.size());
 
-		verify(studentRepository).findAll();
+		verify(studentRepository).findAll((Pageable) any());
 		verify(enrollmentRepository).findAll();
 		verify(studentMapper).studentToStudentDTO(any());
 	}
@@ -104,6 +116,7 @@ class StudentSDJpaServiceTest
 		when(studentRepository.saveAndFlush(any())).thenReturn(returnedStudent);
 		when(studentMapper.studentDTOToStudent(any())).thenReturn(returnedStudent);
 		when(studentMapper.studentToStudentDTO(any())).thenReturn(returnedStudentDTO);
+		when(passwordEncoder.encode(anyString())).thenReturn(ENCODED_PASSWORD);
 
 		Student student = studentMapper.studentDTOToStudent(studentSDJpaService.createNew(studentDTOToSave));
 
@@ -113,6 +126,7 @@ class StudentSDJpaServiceTest
 		verify(studentRepository).saveAndFlush(any());
 		verify(studentMapper, times(2)).studentDTOToStudent(any());
 		verify(studentMapper).studentToStudentDTO(any());
+		verify(passwordEncoder).encode(anyString());
 	}
 
 	@Test
@@ -125,6 +139,7 @@ class StudentSDJpaServiceTest
 		when(studentRepository.saveAndFlush(any())).thenReturn(returnedStudent);
 		when(studentMapper.studentDTOToStudent(any())).thenReturn(returnedStudent);
 		when(studentMapper.studentToStudentDTO(any())).thenReturn(returnedStudentDTO);
+		when(passwordEncoder.encode(anyString())).thenReturn(ENCODED_PASSWORD);
 
 		Student student = studentMapper.studentDTOToStudent(studentSDJpaService.save(studentDTOToSave));
 
@@ -134,6 +149,7 @@ class StudentSDJpaServiceTest
 		verify(studentRepository).saveAndFlush(any());
 		verify(studentMapper, times(2)).studentDTOToStudent(any());
 		verify(studentMapper).studentToStudentDTO(any());
+		verify(passwordEncoder).encode(anyString());
 	}
 
 	@Test
@@ -161,6 +177,7 @@ class StudentSDJpaServiceTest
 		when(studentRepository.saveAndFlush(any())).thenReturn(returnedStudent);
 		when(studentMapper.studentDTOToStudent(any())).thenReturn(returnedStudent);
 		when(studentMapper.studentToStudentDTO(any())).thenReturn(returnedStudentDTO);
+		when(passwordEncoder.encode(anyString())).thenReturn(ENCODED_PASSWORD);
 
 		Student student = studentMapper.studentDTOToStudent(studentSDJpaService.update(ID, studentDTOToSave));
 
@@ -171,6 +188,7 @@ class StudentSDJpaServiceTest
 		verify(studentRepository).findById(anyLong());
 		verify(studentMapper, times(2)).studentDTOToStudent(any());
 		verify(studentMapper).studentToStudentDTO(any());
+		verify(passwordEncoder).encode(anyString());
 	}
 
 	@Test

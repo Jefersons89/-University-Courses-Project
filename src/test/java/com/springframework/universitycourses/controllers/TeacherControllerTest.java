@@ -41,8 +41,11 @@ class TeacherControllerTest
 	public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 	private static final String EMAIL = "test@dummy.com";
-	private static final Long ID = 1L;
 	private static final String NO_NUMERIC_ID = "abc";
+	private static final String FIRST_NAME = "TestName";
+	private static final String LAST_NAME = "TestLastName";
+	private static final String PASSWORD = "123";
+	private static final Long ID = 1L;
 	Set<TeacherDTO> returnedTeacherDTOSet;
 	TeacherDTO returnedTeacherDTO;
 
@@ -131,7 +134,10 @@ class TeacherControllerTest
 	{
 		TeacherDTO teacherDTOToBeCreated = new TeacherDTO();
 		teacherDTOToBeCreated.setId(ID);
+		teacherDTOToBeCreated.setFirstName(FIRST_NAME);
+		teacherDTOToBeCreated.setLastName(LAST_NAME);
 		teacherDTOToBeCreated.setEmail(EMAIL);
+		teacherDTOToBeCreated.setPassword(PASSWORD);
 
 		when(teacherService.createNew(any())).thenReturn(returnedTeacherDTO);
 
@@ -154,7 +160,10 @@ class TeacherControllerTest
 	{
 		TeacherDTO teacherDTOToBeUpdated = new TeacherDTO();
 		teacherDTOToBeUpdated.setId(ID);
+		teacherDTOToBeUpdated.setFirstName(FIRST_NAME);
+		teacherDTOToBeUpdated.setLastName(LAST_NAME);
 		teacherDTOToBeUpdated.setEmail(EMAIL);
+		teacherDTOToBeUpdated.setPassword(PASSWORD);
 
 		when(teacherService.update(anyLong(), any())).thenReturn(returnedTeacherDTO);
 
@@ -177,7 +186,10 @@ class TeacherControllerTest
 	{
 		TeacherDTO teacherDTOToBeUpdated = new TeacherDTO();
 		teacherDTOToBeUpdated.setId(ID);
+		teacherDTOToBeUpdated.setFirstName(FIRST_NAME);
+		teacherDTOToBeUpdated.setLastName(LAST_NAME);
 		teacherDTOToBeUpdated.setEmail(EMAIL);
+		teacherDTOToBeUpdated.setPassword(PASSWORD);
 
 		when(teacherService.update(anyLong(), any())).thenThrow(NotFoundException.class);
 

@@ -17,6 +17,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,14 +103,16 @@ class EnrollmentSDJpaServiceTest
 		List<Enrollment> enrollmentList = new ArrayList<>();
 		enrollmentList.add(returnedEnrollment);
 
-		when(enrollmentRepository.findAll()).thenReturn(enrollmentList);
+		final Page<Enrollment> enrollmentListPage = new PageImpl<>(enrollmentList);
+
+		when(enrollmentRepository.findAll((Pageable) any())).thenReturn(enrollmentListPage);
 		when(enrollmentMapper.enrollmentToEnrollmentDTO(any())).thenReturn(returnedEnrollmentDTO);
 
 		Set<EnrollmentDTO> enrollmentDTOSet = enrollmentSDJpaService.findAll();
 
 		assertEquals(1, enrollmentDTOSet.size());
 
-		verify(enrollmentRepository).findAll();
+		verify(enrollmentRepository).findAll((Pageable) any());
 		verify(enrollmentMapper).enrollmentToEnrollmentDTO(any());
 	}
 

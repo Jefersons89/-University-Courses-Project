@@ -18,6 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,8 +45,11 @@ class EnrollmentControllerTest
 			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 	private static final Long STUDENT_ID = 1L;
 	private static final Long ASSIGNMENT_ID = 2L;
+	private static final Long GRADE = 3L;
 	private static final String NO_STUDENT_ID = "abc";
 	private static final String NO_ASSIGNMENT_ID = "abcd";
+	private static final String PROGRESS = "true";
+	private static final Date ENROLLMENT_DATE = new GregorianCalendar(2023, Calendar.SEPTEMBER, 8).getTime();
 
 	Set<EnrollmentDTO> returnedEnrollmentSet;
 	EnrollmentDTO returnedEnrollmentDTO;
@@ -137,6 +143,9 @@ class EnrollmentControllerTest
 		EnrollmentIdDTO enrollmentIdDTOToCreate = new EnrollmentIdDTO(STUDENT_ID, ASSIGNMENT_ID);
 		EnrollmentDTO enrollmentDTOToCreate = new EnrollmentDTO();
 		enrollmentDTOToCreate.setId(enrollmentIdDTOToCreate);
+		enrollmentDTOToCreate.setEnrollmentDate(ENROLLMENT_DATE);
+		enrollmentDTOToCreate.setGrade(GRADE);
+		enrollmentDTOToCreate.setInProgress(PROGRESS);
 
 		when(enrollmentService.createNew(any())).thenReturn(returnedEnrollmentDTO);
 
