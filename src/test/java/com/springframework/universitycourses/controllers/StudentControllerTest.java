@@ -66,9 +66,7 @@ class StudentControllerTest
 	{
 		returnedStudentDTOSet = new HashSet<>();
 
-		returnedStudentDTO = new StudentDTO();
-		returnedStudentDTO.setId(ID);
-		returnedStudentDTO.setEmail(EMAIL);
+		returnedStudentDTO = StudentDTO.builder().id(ID).email(EMAIL).build();
 
 		mockMvc = MockMvcBuilders
 				.standaloneSetup(studentController)
@@ -79,13 +77,9 @@ class StudentControllerTest
 	@Test
 	void getListOfStudents() throws Exception
 	{
-		StudentDTO studentDTO1 = new StudentDTO();
-		studentDTO1.setId(1L);
-		studentDTO1.setEmail("test1@dummy.com");
+		StudentDTO studentDTO1 = StudentDTO.builder().id(1L).email("test1@dummy.com").build();
 
-		StudentDTO studentDTO2 = new StudentDTO();
-		studentDTO2.setId(2L);
-		studentDTO2.setEmail("test2@dummy.com");
+		StudentDTO studentDTO2 = StudentDTO.builder().id(2L).email("test2@dummy.com").build();
 
 		returnedStudentDTOSet.add(studentDTO1);
 		returnedStudentDTOSet.add(studentDTO2);
@@ -136,13 +130,15 @@ class StudentControllerTest
 	@Test
 	void createNewStudent() throws Exception
 	{
-		StudentDTO studentDTOToCreate = new StudentDTO();
-		studentDTOToCreate.setId(ID);
-		studentDTOToCreate.setFirstName(FIRST_NAME);
-		studentDTOToCreate.setLastName(LAST_NAME);
-		studentDTOToCreate.setEmail(EMAIL);
-		studentDTOToCreate.setPassword(PASSWORD);
-		studentDTOToCreate.setEnrollmentYear(ENROLLMENT_YEAR);
+		StudentDTO studentDTOToCreate =
+				StudentDTO.builder()
+						.id(ID)
+						.firstName(FIRST_NAME)
+						.lastName(LAST_NAME)
+						.email(EMAIL)
+						.password(PASSWORD)
+						.enrollmentYear(ENROLLMENT_YEAR)
+						.build();
 
 		when(studentService.createNew(any())).thenReturn(returnedStudentDTO);
 
@@ -163,13 +159,15 @@ class StudentControllerTest
 	@Test
 	void updateStudent() throws Exception
 	{
-		StudentDTO studentDTOToUpdate = new StudentDTO();
-		studentDTOToUpdate.setId(ID);
-		studentDTOToUpdate.setFirstName(FIRST_NAME);
-		studentDTOToUpdate.setLastName(LAST_NAME);
-		studentDTOToUpdate.setEmail(EMAIL);
-		studentDTOToUpdate.setPassword(PASSWORD);
-		studentDTOToUpdate.setEnrollmentYear(ENROLLMENT_YEAR);
+		StudentDTO studentDTOToUpdate =
+				StudentDTO.builder()
+						.id(ID)
+						.firstName(FIRST_NAME)
+						.lastName(LAST_NAME)
+						.email(EMAIL)
+						.password(PASSWORD)
+						.enrollmentYear(ENROLLMENT_YEAR)
+						.build();
 
 		when(studentService.update(anyLong(), any())).thenReturn(returnedStudentDTO);
 
@@ -190,13 +188,15 @@ class StudentControllerTest
 	@Test
 	void updateStudentNotFound() throws Exception
 	{
-		StudentDTO studentDTOToUpdate = new StudentDTO();
-		studentDTOToUpdate.setId(ID);
-		studentDTOToUpdate.setFirstName(FIRST_NAME);
-		studentDTOToUpdate.setLastName(LAST_NAME);
-		studentDTOToUpdate.setEmail(EMAIL);
-		studentDTOToUpdate.setPassword(PASSWORD);
-		studentDTOToUpdate.setEnrollmentYear(ENROLLMENT_YEAR);
+		StudentDTO studentDTOToUpdate =
+				StudentDTO.builder()
+						.id(ID)
+						.firstName(FIRST_NAME)
+						.lastName(LAST_NAME)
+						.email(EMAIL)
+						.password(PASSWORD)
+						.enrollmentYear(ENROLLMENT_YEAR)
+						.build();
 
 		when(studentService.update(anyLong(), any())).thenThrow(NotFoundException.class);
 
@@ -216,9 +216,7 @@ class StudentControllerTest
 	@Test
 	void updateStudentNumberFormatException() throws Exception
 	{
-		StudentDTO studentDTOToUpdate = new StudentDTO();
-		studentDTOToUpdate.setId(ID);
-		studentDTOToUpdate.setEmail(EMAIL);
+		StudentDTO studentDTOToUpdate = StudentDTO.builder().id(ID).email(EMAIL).build();
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);

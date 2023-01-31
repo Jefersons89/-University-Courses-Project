@@ -1,7 +1,9 @@
 package com.springframework.universitycourses.controllers;
 
+import com.springframework.universitycourses.api.v1.model.AssignmentListDTO;
 import com.springframework.universitycourses.api.v1.model.CourseDTO;
 import com.springframework.universitycourses.api.v1.model.CourseListDTO;
+import com.springframework.universitycourses.api.v1.model.StudentListDTO;
 import com.springframework.universitycourses.services.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.WebDataBinder;
@@ -49,6 +51,20 @@ public class CourseController
 	public CourseDTO getCourseById(@PathVariable Long courseId)
 	{
 		return getCourseService().findById(courseId);
+	}
+
+	@GetMapping({ "/{courseId}/assignments" })
+	@ResponseStatus(HttpStatus.OK)
+	public AssignmentListDTO getCourseAssignments(@PathVariable Long courseId)
+	{
+		return getCourseService().getCourseAssignments(courseId);
+	}
+
+	@GetMapping({ "/{courseId}/students" })
+	@ResponseStatus(HttpStatus.OK)
+	public StudentListDTO getCourseStudents(@PathVariable Long courseId)
+	{
+		return getCourseService().getCourseStudents(courseId);
 	}
 
 	@PostMapping

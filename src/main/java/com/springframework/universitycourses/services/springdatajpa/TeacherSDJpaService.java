@@ -1,6 +1,8 @@
 package com.springframework.universitycourses.services.springdatajpa;
 
+import com.springframework.universitycourses.api.v1.mapper.AssignmentMapper;
 import com.springframework.universitycourses.api.v1.mapper.TeacherMapper;
+import com.springframework.universitycourses.api.v1.model.AssignmentDTO;
 import com.springframework.universitycourses.api.v1.model.TeacherDTO;
 import com.springframework.universitycourses.exceptions.NotFoundException;
 import com.springframework.universitycourses.model.Role;
@@ -31,15 +33,18 @@ public class TeacherSDJpaService implements TeacherService
 	private final RoleRepository roleRepository;
 	private final TeacherMapper teacherMapper;
 	private final BCryptPasswordEncoder passwordEncoder;
+	private final AssignmentMapper assignmentMapper;
 
 	public TeacherSDJpaService(final TeacherRepository teacherRepository, final AssignmentRepository assignmentRepository,
-			final RoleRepository roleRepository, final TeacherMapper teacherMapper, final BCryptPasswordEncoder passwordEncoder)
+			final RoleRepository roleRepository, final TeacherMapper teacherMapper, final BCryptPasswordEncoder passwordEncoder,
+			final AssignmentMapper assignmentMapper)
 	{
 		this.teacherRepository = teacherRepository;
 		this.assignmentRepository = assignmentRepository;
 		this.roleRepository = roleRepository;
 		this.teacherMapper = teacherMapper;
 		this.passwordEncoder = passwordEncoder;
+		this.assignmentMapper = assignmentMapper;
 	}
 
 	@Override
@@ -58,6 +63,19 @@ public class TeacherSDJpaService implements TeacherService
 	}
 
 	@Override
+	public Teacher findByModelById(final Long id)
+	{
+		Optional<Teacher> teacher = getTeacherRepository().findById(id);
+
+		if (teacher.isEmpty())
+		{
+			throw new NotFoundException("Teacher Not Found for id: " + id);
+		}
+
+		return teacher.orElse(null);
+	}
+
+	@Override
 	public Set<TeacherDTO> findAll()
 	{
 		Pageable sortedByFirstName =
@@ -68,6 +86,21 @@ public class TeacherSDJpaService implements TeacherService
 		return teachers
 				.stream()
 				.map(getTeacherMapper()::teacherToTeacherDTO)
+				.collect(Collectors.toSet());
+	}
+
+	@Override
+	public Set<AssignmentDTO> getTeacherAssignments(final Long id)
+	{
+		Teacher teacher = this.findByModelById(id);
+
+		if (teacher.getAssignments().isEmpty())
+		{
+			throw new NotFoundException("No assignments found for teacher with id: " + id);
+		}
+
+		return teacher.getAssignments().stream()
+				.map(assignmentMapper::assignmentToAssignmentDTO)
 				.collect(Collectors.toSet());
 	}
 

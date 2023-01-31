@@ -1,6 +1,6 @@
 package com.springframework.universitycourses.api.v1.model;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +14,6 @@ import java.util.Set;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class TeacherDTO
 {
 	private Long id;
@@ -37,4 +36,18 @@ public class TeacherDTO
 
 	private Set<String> roles;
 	private Set<AssignmentDTO> assignments;
+
+	@Builder
+	public TeacherDTO(final Long id, final String firstName, final String lastName, final String email, final String password,
+			final Set<String> roles,
+			final Set<AssignmentDTO> assignments)
+	{
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.password = password;
+		this.roles = roles;
+		this.assignments = assignments;
+	}
 }

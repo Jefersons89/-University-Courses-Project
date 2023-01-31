@@ -1,6 +1,6 @@
 package com.springframework.universitycourses.api.v1.model;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +16,6 @@ import java.util.Set;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class CourseDTO
 {
 	private Long id;
@@ -37,4 +36,15 @@ public class CourseDTO
 	private Long credit;
 
 	private Set<AssignmentDTO> assignments;
+
+	@Builder
+	public CourseDTO(final Long id, final String title, final String description, final Long credit,
+			final Set<AssignmentDTO> assignments)
+	{
+		this.id = id;
+		this.title = title;
+		this.description = description;
+		this.credit = credit;
+		this.assignments = assignments;
+	}
 }

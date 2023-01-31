@@ -70,8 +70,7 @@ class EnrollmentControllerTest
 
 		enrollmentIdDTO = new EnrollmentIdDTO(STUDENT_ID, ASSIGNMENT_ID);
 
-		returnedEnrollmentDTO = new EnrollmentDTO();
-		returnedEnrollmentDTO.setId(enrollmentIdDTO);
+		returnedEnrollmentDTO = EnrollmentDTO.builder().id(enrollmentIdDTO).build();
 
 		mockMvc = MockMvcBuilders
 				.standaloneSetup(enrollmentController)
@@ -141,11 +140,13 @@ class EnrollmentControllerTest
 	void createNewEnrollment() throws Exception
 	{
 		EnrollmentIdDTO enrollmentIdDTOToCreate = new EnrollmentIdDTO(STUDENT_ID, ASSIGNMENT_ID);
-		EnrollmentDTO enrollmentDTOToCreate = new EnrollmentDTO();
-		enrollmentDTOToCreate.setId(enrollmentIdDTOToCreate);
-		enrollmentDTOToCreate.setEnrollmentDate(ENROLLMENT_DATE);
-		enrollmentDTOToCreate.setGrade(GRADE);
-		enrollmentDTOToCreate.setInProgress(PROGRESS);
+		EnrollmentDTO enrollmentDTOToCreate =
+				EnrollmentDTO.builder()
+						.id(enrollmentIdDTOToCreate)
+						.enrollmentDate(ENROLLMENT_DATE)
+						.grade(GRADE)
+						.inProgress(PROGRESS)
+						.build();
 
 		when(enrollmentService.createNew(any())).thenReturn(returnedEnrollmentDTO);
 
@@ -168,8 +169,7 @@ class EnrollmentControllerTest
 	void updateEnrollment() throws Exception
 	{
 		EnrollmentIdDTO enrollmentIdDTOToUpdate = new EnrollmentIdDTO(STUDENT_ID, ASSIGNMENT_ID);
-		EnrollmentDTO enrollmentDTOToUpdate = new EnrollmentDTO();
-		enrollmentDTOToUpdate.setId(enrollmentIdDTOToUpdate);
+		EnrollmentDTO enrollmentDTOToUpdate = EnrollmentDTO.builder().id(enrollmentIdDTOToUpdate).build();
 
 		when(enrollmentService.update(any(), any())).thenReturn(returnedEnrollmentDTO);
 
@@ -192,8 +192,7 @@ class EnrollmentControllerTest
 	void updateEnrollmentNotFound() throws Exception
 	{
 		EnrollmentIdDTO enrollmentIdDTOToUpdate = new EnrollmentIdDTO(STUDENT_ID, ASSIGNMENT_ID);
-		EnrollmentDTO enrollmentDTOToUpdate = new EnrollmentDTO();
-		enrollmentDTOToUpdate.setId(enrollmentIdDTOToUpdate);
+		EnrollmentDTO enrollmentDTOToUpdate = EnrollmentDTO.builder().id(enrollmentIdDTOToUpdate).build();
 
 		when(enrollmentService.update(any(), any())).thenThrow(NotFoundException.class);
 
@@ -214,8 +213,7 @@ class EnrollmentControllerTest
 	void updateEnrollmentNumberFormatException() throws Exception
 	{
 		EnrollmentIdDTO enrollmentIdDTOToUpdate = new EnrollmentIdDTO(STUDENT_ID, ASSIGNMENT_ID);
-		EnrollmentDTO enrollmentDTOToUpdate = new EnrollmentDTO();
-		enrollmentDTOToUpdate.setId(enrollmentIdDTOToUpdate);
+		EnrollmentDTO enrollmentDTOToUpdate = EnrollmentDTO.builder().id(enrollmentIdDTOToUpdate).build();
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);

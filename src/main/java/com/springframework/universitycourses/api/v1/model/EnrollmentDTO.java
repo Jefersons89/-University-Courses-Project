@@ -1,7 +1,7 @@
 package com.springframework.universitycourses.api.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +15,6 @@ import java.util.Date;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class EnrollmentDTO
 {
 	private EnrollmentIdDTO id;
@@ -31,4 +30,13 @@ public class EnrollmentDTO
 
 	@NotNull(message = "Progress Stage is mandatory")
 	private String inProgress;
+
+	@Builder
+	public EnrollmentDTO(final EnrollmentIdDTO id, final Date enrollmentDate, final Long grade, final String inProgress)
+	{
+		this.id = id;
+		this.enrollmentDate = enrollmentDate;
+		this.grade = grade;
+		this.inProgress = inProgress;
+	}
 }

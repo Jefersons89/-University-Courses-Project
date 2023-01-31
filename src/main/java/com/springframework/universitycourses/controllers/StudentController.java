@@ -51,6 +51,13 @@ public class StudentController
 		return getStudentService().findById(studentId);
 	}
 
+	@GetMapping({ "/{studentId}/assignments" })
+	@ResponseStatus(HttpStatus.OK)
+	public Object getStudentAssignments(@PathVariable Long studentId)
+	{
+		return getStudentService().getStudentAssignments(studentId);
+	}
+
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public StudentDTO createNewStudent(@RequestBody @Valid StudentDTO studentDTO)

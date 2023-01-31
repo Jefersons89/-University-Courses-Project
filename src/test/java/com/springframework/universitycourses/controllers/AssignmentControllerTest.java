@@ -63,9 +63,7 @@ class AssignmentControllerTest
 	{
 		returnedAssignmentDTOSet = new HashSet<>();
 
-		returnedAssignmentDTO = new AssignmentDTO();
-		returnedAssignmentDTO.setId(ID);
-		returnedAssignmentDTO.setTitle(TITLE);
+		returnedAssignmentDTO = AssignmentDTO.builder().id(ID).title(TITLE).build();
 
 		mockMvc = MockMvcBuilders
 				.standaloneSetup(assignmentController)
@@ -76,13 +74,9 @@ class AssignmentControllerTest
 	@Test
 	void getListOfAssignments() throws Exception
 	{
-		AssignmentDTO assignmentDTO1 = new AssignmentDTO();
-		assignmentDTO1.setId(1L);
-		assignmentDTO1.setTitle("Test1");
+		AssignmentDTO assignmentDTO1 = AssignmentDTO.builder().id(1L).title("Test1").build();
 
-		AssignmentDTO assignmentDTO2 = new AssignmentDTO();
-		assignmentDTO2.setId(2L);
-		assignmentDTO2.setTitle("Test2");
+		AssignmentDTO assignmentDTO2 = AssignmentDTO.builder().id(2L).title("Test2").build();
 
 		returnedAssignmentDTOSet.add(assignmentDTO1);
 		returnedAssignmentDTOSet.add(assignmentDTO2);
@@ -134,13 +128,15 @@ class AssignmentControllerTest
 	@Test
 	void createNewAssignment() throws Exception
 	{
-		AssignmentDTO assignmentDTOToCreate = new AssignmentDTO();
-		assignmentDTOToCreate.setId(ID);
-		assignmentDTOToCreate.setTitle(TITLE);
-		assignmentDTOToCreate.setDescription(DESCRIPTION);
-		assignmentDTOToCreate.setPoints(POINTS);
-		assignmentDTOToCreate.setCourseId(COURSE_ID);
-		assignmentDTOToCreate.setTeacherId(TEACHER_ID);
+		AssignmentDTO assignmentDTOToCreate =
+				AssignmentDTO.builder()
+						.id(ID)
+						.title(TITLE)
+						.description(DESCRIPTION)
+						.points(POINTS)
+						.courseId(COURSE_ID)
+						.teacherId(TEACHER_ID)
+						.build();
 
 		when(assignmentService.createNew(any())).thenReturn(returnedAssignmentDTO);
 
@@ -161,13 +157,15 @@ class AssignmentControllerTest
 	@Test
 	void updateAssignment() throws Exception
 	{
-		AssignmentDTO assignmentDTOToUpdated = new AssignmentDTO();
-		assignmentDTOToUpdated.setId(ID);
-		assignmentDTOToUpdated.setTitle(TITLE);
-		assignmentDTOToUpdated.setDescription(DESCRIPTION);
-		assignmentDTOToUpdated.setPoints(POINTS);
-		assignmentDTOToUpdated.setCourseId(COURSE_ID);
-		assignmentDTOToUpdated.setTeacherId(TEACHER_ID);
+		AssignmentDTO assignmentDTOToUpdated =
+				AssignmentDTO.builder()
+						.id(ID)
+						.title(TITLE)
+						.description(DESCRIPTION)
+						.points(POINTS)
+						.courseId(COURSE_ID)
+						.teacherId(TEACHER_ID)
+						.build();
 
 		when(assignmentService.update(anyLong(), any())).thenReturn(returnedAssignmentDTO);
 
@@ -188,13 +186,14 @@ class AssignmentControllerTest
 	@Test
 	void updateAssignmentNotFound() throws Exception
 	{
-		AssignmentDTO assignmentDTOToUpdated = new AssignmentDTO();
-		assignmentDTOToUpdated.setId(ID);
-		assignmentDTOToUpdated.setTitle(TITLE);
-		assignmentDTOToUpdated.setDescription(DESCRIPTION);
-		assignmentDTOToUpdated.setPoints(POINTS);
-		assignmentDTOToUpdated.setCourseId(COURSE_ID);
-		assignmentDTOToUpdated.setTeacherId(TEACHER_ID);
+		AssignmentDTO assignmentDTOToUpdated = AssignmentDTO.builder()
+				.id(ID)
+				.title(TITLE)
+				.description(DESCRIPTION)
+				.points(POINTS)
+				.courseId(COURSE_ID)
+				.teacherId(TEACHER_ID)
+				.build();
 
 		when(assignmentService.update(anyLong(), any())).thenThrow(NotFoundException.class);
 
@@ -214,9 +213,7 @@ class AssignmentControllerTest
 	@Test
 	void updateAssignmentNumberFormatException() throws Exception
 	{
-		AssignmentDTO assignmentDTOToUpdated = new AssignmentDTO();
-		assignmentDTOToUpdated.setId(ID);
-		assignmentDTOToUpdated.setTitle(TITLE);
+		AssignmentDTO assignmentDTOToUpdated = AssignmentDTO.builder().id(ID).title(TITLE).build();
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);

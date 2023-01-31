@@ -1,5 +1,6 @@
 package com.springframework.universitycourses.controllers;
 
+import com.springframework.universitycourses.api.v1.model.AssignmentListDTO;
 import com.springframework.universitycourses.api.v1.model.TeacherDTO;
 import com.springframework.universitycourses.api.v1.model.TeacherListDTO;
 import com.springframework.universitycourses.services.TeacherService;
@@ -49,6 +50,13 @@ public class TeacherController
 	public TeacherDTO getTeacherById(@PathVariable Long teacherId)
 	{
 		return getTeacherService().findById(teacherId);
+	}
+
+	@GetMapping({ "/{teacherId}/assignments" })
+	@ResponseStatus(HttpStatus.OK)
+	public AssignmentListDTO getTeacherAssignments(@PathVariable Long teacherId)
+	{
+		return new AssignmentListDTO(getTeacherService().getTeacherAssignments(teacherId));
 	}
 
 	@PostMapping

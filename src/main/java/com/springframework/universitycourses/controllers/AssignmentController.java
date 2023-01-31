@@ -2,6 +2,8 @@ package com.springframework.universitycourses.controllers;
 
 import com.springframework.universitycourses.api.v1.model.AssignmentDTO;
 import com.springframework.universitycourses.api.v1.model.AssignmentListDTO;
+import com.springframework.universitycourses.api.v1.model.StudentListDTO;
+import com.springframework.universitycourses.api.v1.model.TeacherDTO;
 import com.springframework.universitycourses.services.AssignmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.WebDataBinder;
@@ -51,6 +53,34 @@ public class AssignmentController
 	public AssignmentDTO getAssignmentById(@PathVariable Long assignmentId)
 	{
 		return getAssignmentService().findById(assignmentId);
+	}
+
+	@GetMapping({ "/{assignmentId}/students" })
+	@ResponseStatus(HttpStatus.OK)
+	public StudentListDTO getAssignmentStudents(@PathVariable Long assignmentId)
+	{
+		return new StudentListDTO(getAssignmentService().getAssignmentStudents(assignmentId));
+	}
+
+	@GetMapping({ "/{assignmentId}/students/finished" })
+	@ResponseStatus(HttpStatus.OK)
+	public Object getAssignmentStudentsFinished(@PathVariable Long assignmentId)
+	{
+		return getAssignmentService().getAssignmentStudentsFinished(assignmentId);
+	}
+
+	@GetMapping({ "/{assignmentId}/students/inProgress" })
+	@ResponseStatus(HttpStatus.OK)
+	public Object getAssignmentStudentsInProgress(@PathVariable Long assignmentId)
+	{
+		return getAssignmentService().getAssignmentStudentsInProgress(assignmentId);
+	}
+
+	@GetMapping({ "/{assignmentId}/teacher" })
+	@ResponseStatus(HttpStatus.OK)
+	public TeacherDTO getAssignmentTeachers(@PathVariable Long assignmentId)
+	{
+		return getAssignmentService().getAssignmentTeachers(assignmentId);
 	}
 
 	@PostMapping

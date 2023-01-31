@@ -1,7 +1,11 @@
 package com.springframework.universitycourses.services.springdatajpa;
 
 import com.springframework.universitycourses.api.v1.mapper.AssignmentMapper;
+import com.springframework.universitycourses.api.v1.mapper.StudentMapper;
+import com.springframework.universitycourses.api.v1.mapper.TeacherMapper;
 import com.springframework.universitycourses.api.v1.model.AssignmentDTO;
+import com.springframework.universitycourses.api.v1.model.StudentDTO;
+import com.springframework.universitycourses.api.v1.model.TeacherDTO;
 import com.springframework.universitycourses.exceptions.NotFoundException;
 import com.springframework.universitycourses.model.Assignment;
 import com.springframework.universitycourses.model.Course;
@@ -20,9 +24,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -37,11 +44,13 @@ public class AssignmentSDJpaService implements AssignmentService
 	private final StudentRepository studentRepository;
 	private final CourseRepository courseRepository;
 	private final TeacherRepository teacherRepository;
+	private final StudentMapper studentMapper;
+	private final TeacherMapper teacherMapper;
 	private final AssignmentMapper assignmentMapper;
 
 	public AssignmentSDJpaService(final AssignmentRepository assignmentRepository, final EnrollmentRepository enrollmentRepository,
 			final StudentRepository studentRepository, final CourseRepository courseRepository,
-			final TeacherRepository teacherRepository,
+			final TeacherRepository teacherRepository, final StudentMapper studentMapper, final TeacherMapper teacherMapper,
 			final AssignmentMapper assignmentMapper)
 	{
 		this.assignmentRepository = assignmentRepository;
@@ -49,6 +58,8 @@ public class AssignmentSDJpaService implements AssignmentService
 		this.studentRepository = studentRepository;
 		this.courseRepository = courseRepository;
 		this.teacherRepository = teacherRepository;
+		this.studentMapper = studentMapper;
+		this.teacherMapper = teacherMapper;
 		this.assignmentMapper = assignmentMapper;
 	}
 
@@ -111,6 +122,88 @@ public class AssignmentSDJpaService implements AssignmentService
 		{
 			assignment.setEnrollments(Collections.emptySet());
 		}
+	}
+
+	@Override
+	public Set<StudentDTO> getAssignmentStudents(final Long id)
+	{
+		Assignment assignment =  getAssignment(id);
+
+		Set<Student> students = assignment.getEnrollments().stream()
+				.map(Enrollment::getStudent)
+				.collect(Collectors.toSet());
+
+		return students.stream()
+				.map(studentMapper::studentToStudentDTO)
+				.collect(Collectors.toSet());
+	}
+
+	@Override
+	public TeacherDTO getAssignmentTeachers(final Long id)
+	{
+		Assignment assignment = this.findByModelById(id);
+
+		if (Objects.isNull(assignment.getTeacher()))
+		{
+			throw new NotFoundException("Not Teacher found for assignment with id: " + id);
+		}
+
+		return teacherMapper.teacherToTeacherDTO(assignment.getTeacher());
+	}
+
+	@Override
+	public List<Map<String, Object>> getAssignmentStudentsFinished(final Long id)
+	{
+		Assignment assignment = getAssignment(id);
+
+		Set<Student> students =
+				assignment.getEnrollments().stream()
+						.filter(enrollment -> enrollment.getInProgress().equals(false))
+						.map(Enrollment::getStudent)
+						.collect(Collectors.toSet());
+
+		return getMapList(assignment, students);
+	}
+
+	@Override
+	public List<Map<String, Object>> getAssignmentStudentsInProgress(final Long id)
+	{
+		Assignment assignment = getAssignment(id);
+
+		Set<Student> students =
+				assignment.getEnrollments().stream()
+						.filter(enrollment -> enrollment.getInProgress().equals(true))
+						.map(Enrollment::getStudent)
+						.collect(Collectors.toSet());
+
+		return getMapList(assignment, students);
+	}
+
+	private static List<Map<String, Object>> getMapList(final Assignment assignment, final Set<Student> students)
+	{
+		List<Map<String, Object>> assignmentsList = new ArrayList<>();
+		students.forEach(studentDTO -> {
+			Optional<Enrollment> enrollment = assignment.getEnrollments().stream()
+					.filter(e -> e.getId().getStudentId().equals(studentDTO.getId()))
+					.findFirst();
+			Map<String, Object> object = new HashMap<>();
+			object.put("StudentId", studentDTO.getId());
+			object.put("StudentName", studentDTO.getFirstName() + "" + studentDTO.getLastName());
+			object.put("grade", enrollment.map(Enrollment::getGrade).orElse(null));
+			assignmentsList.add(object);
+		});
+		return assignmentsList;
+	}
+
+	private Assignment getAssignment(final Long id)
+	{
+		Assignment assignment = this.findByModelById(id);
+
+		if (assignment.getEnrollments().isEmpty())
+		{
+			throw new NotFoundException("Not enrollments found for assignment with id: " + id);
+		}
+		return assignment;
 	}
 
 	@Override

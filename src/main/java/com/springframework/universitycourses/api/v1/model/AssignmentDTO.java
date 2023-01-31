@@ -1,6 +1,6 @@
 package com.springframework.universitycourses.api.v1.model;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +18,6 @@ import java.util.Set;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class AssignmentDTO
 {
 	private Long id;
@@ -44,4 +43,18 @@ public class AssignmentDTO
 	@NotNull(message = "Description is mandatory")
 	private Long teacherId;
 	private Set<EnrollmentDTO> enrollments;
+
+	@Builder
+	public AssignmentDTO(final Long id, final String title, final String description, final Long points, final Long courseId,
+			final Long teacherId,
+			final Set<EnrollmentDTO> enrollments)
+	{
+		this.id = id;
+		this.title = title;
+		this.description = description;
+		this.points = points;
+		this.courseId = courseId;
+		this.teacherId = teacherId;
+		this.enrollments = enrollments;
+	}
 }

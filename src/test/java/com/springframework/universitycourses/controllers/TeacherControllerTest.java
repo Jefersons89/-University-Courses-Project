@@ -62,9 +62,7 @@ class TeacherControllerTest
 	{
 		returnedTeacherDTOSet = new HashSet<>();
 
-		returnedTeacherDTO = new TeacherDTO();
-		returnedTeacherDTO.setId(ID);
-		returnedTeacherDTO.setEmail(EMAIL);
+		returnedTeacherDTO = TeacherDTO.builder().id(ID).email(EMAIL).build();
 
 		mockMvc = MockMvcBuilders
 				.standaloneSetup(teacherController)
@@ -75,13 +73,9 @@ class TeacherControllerTest
 	@Test
 	void getListOfTeachers() throws Exception
 	{
-		TeacherDTO teacherDTO1 = new TeacherDTO();
-		teacherDTO1.setId(ID);
-		teacherDTO1.setEmail(EMAIL);
+		TeacherDTO teacherDTO1 = TeacherDTO.builder().id(1L).email("test1@dummy.com").build();
 
-		TeacherDTO teacherDTO2 = new TeacherDTO();
-		teacherDTO2.setId(ID);
-		teacherDTO2.setEmail(EMAIL);
+		TeacherDTO teacherDTO2 = TeacherDTO.builder().id(2L).email("test2@dummy.com").build();
 
 		returnedTeacherDTOSet.add(teacherDTO1);
 		returnedTeacherDTOSet.add(teacherDTO2);
@@ -132,12 +126,14 @@ class TeacherControllerTest
 	@Test
 	void createNewTeacher() throws Exception
 	{
-		TeacherDTO teacherDTOToBeCreated = new TeacherDTO();
-		teacherDTOToBeCreated.setId(ID);
-		teacherDTOToBeCreated.setFirstName(FIRST_NAME);
-		teacherDTOToBeCreated.setLastName(LAST_NAME);
-		teacherDTOToBeCreated.setEmail(EMAIL);
-		teacherDTOToBeCreated.setPassword(PASSWORD);
+		TeacherDTO teacherDTOToBeCreated =
+				TeacherDTO.builder()
+						.id(ID)
+						.firstName(FIRST_NAME)
+						.lastName(LAST_NAME)
+						.email(EMAIL)
+						.password(PASSWORD)
+						.build();
 
 		when(teacherService.createNew(any())).thenReturn(returnedTeacherDTO);
 
@@ -158,12 +154,14 @@ class TeacherControllerTest
 	@Test
 	void updateTeacher() throws Exception
 	{
-		TeacherDTO teacherDTOToBeUpdated = new TeacherDTO();
-		teacherDTOToBeUpdated.setId(ID);
-		teacherDTOToBeUpdated.setFirstName(FIRST_NAME);
-		teacherDTOToBeUpdated.setLastName(LAST_NAME);
-		teacherDTOToBeUpdated.setEmail(EMAIL);
-		teacherDTOToBeUpdated.setPassword(PASSWORD);
+		TeacherDTO teacherDTOToBeUpdated =
+				TeacherDTO.builder()
+						.id(ID)
+						.firstName(FIRST_NAME)
+						.lastName(LAST_NAME)
+						.email(EMAIL)
+						.password(PASSWORD)
+						.build();
 
 		when(teacherService.update(anyLong(), any())).thenReturn(returnedTeacherDTO);
 
@@ -184,12 +182,14 @@ class TeacherControllerTest
 	@Test
 	void updateTeacherNotFound() throws Exception
 	{
-		TeacherDTO teacherDTOToBeUpdated = new TeacherDTO();
-		teacherDTOToBeUpdated.setId(ID);
-		teacherDTOToBeUpdated.setFirstName(FIRST_NAME);
-		teacherDTOToBeUpdated.setLastName(LAST_NAME);
-		teacherDTOToBeUpdated.setEmail(EMAIL);
-		teacherDTOToBeUpdated.setPassword(PASSWORD);
+		TeacherDTO teacherDTOToBeUpdated =
+				TeacherDTO.builder()
+						.id(ID)
+						.firstName(FIRST_NAME)
+						.lastName(LAST_NAME)
+						.email(EMAIL)
+						.password(PASSWORD)
+						.build();
 
 		when(teacherService.update(anyLong(), any())).thenThrow(NotFoundException.class);
 
@@ -209,9 +209,7 @@ class TeacherControllerTest
 	@Test
 	void updateTeacherNumberFormatException() throws Exception
 	{
-		TeacherDTO teacherDTOToBeUpdated = new TeacherDTO();
-		teacherDTOToBeUpdated.setId(ID);
-		teacherDTOToBeUpdated.setEmail(EMAIL);
+		TeacherDTO teacherDTOToBeUpdated = TeacherDTO.builder().id(ID).email(EMAIL).build();
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);

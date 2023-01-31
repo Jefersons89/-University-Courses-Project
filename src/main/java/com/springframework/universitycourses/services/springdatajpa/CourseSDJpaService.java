@@ -1,12 +1,18 @@
 package com.springframework.universitycourses.services.springdatajpa;
 
+import com.springframework.universitycourses.api.v1.mapper.AssignmentMapper;
 import com.springframework.universitycourses.api.v1.mapper.CourseMapper;
+import com.springframework.universitycourses.api.v1.mapper.StudentMapper;
+import com.springframework.universitycourses.api.v1.model.AssignmentListDTO;
 import com.springframework.universitycourses.api.v1.model.CourseDTO;
+import com.springframework.universitycourses.api.v1.model.StudentListDTO;
 import com.springframework.universitycourses.exceptions.NotFoundException;
 import com.springframework.universitycourses.model.Assignment;
 import com.springframework.universitycourses.model.Course;
+import com.springframework.universitycourses.model.Student;
 import com.springframework.universitycourses.repositories.AssignmentRepository;
 import com.springframework.universitycourses.repositories.CourseRepository;
+import com.springframework.universitycourses.repositories.EnrollmentRepository;
 import com.springframework.universitycourses.services.CourseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,23 +27,33 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.springframework.universitycourses.services.springdatajpa.AssignmentSDJpaService.setEnrollments;
+
 
 @Service
 public class CourseSDJpaService implements CourseService
 {
 	private final CourseRepository courseRepository;
 	private final AssignmentRepository assignmentRepository;
+	private final EnrollmentRepository enrollmentRepository;
 	private final AssignmentSDJpaService assignmentSDJpaService;
 	private final CourseMapper courseMapper;
+	private final AssignmentMapper assignmentMapper;
+	private final StudentMapper studentMapper;
 
 	public CourseSDJpaService(final CourseRepository courseRepository, final AssignmentRepository assignmentRepository,
-			final AssignmentSDJpaService assignmentSDJpaService,
-			final CourseMapper courseMapper)
+			final EnrollmentRepository enrollmentRepository, final AssignmentSDJpaService assignmentSDJpaService,
+			final CourseMapper courseMapper,
+			final AssignmentMapper assignmentMapper,
+			final StudentMapper studentMapper)
 	{
 		this.courseRepository = courseRepository;
 		this.assignmentRepository = assignmentRepository;
+		this.enrollmentRepository = enrollmentRepository;
 		this.assignmentSDJpaService = assignmentSDJpaService;
 		this.courseMapper = courseMapper;
+		this.assignmentMapper = assignmentMapper;
+		this.studentMapper = studentMapper;
 	}
 
 	@Override
@@ -88,6 +104,34 @@ public class CourseSDJpaService implements CourseService
 				.stream()
 				.map(getCourseMapper()::courseToCourseDTO)
 				.collect(Collectors.toSet());
+	}
+
+	@Override
+	public AssignmentListDTO getCourseAssignments(final Long courseId)
+	{
+		Course course = this.findByModelById(courseId);
+		return new AssignmentListDTO(
+				course.getAssignments()
+						.stream()
+						.map(assignmentMapper::assignmentToAssignmentDTO)
+						.collect(Collectors.toSet()));
+	}
+
+	@Override
+	public StudentListDTO getCourseStudents(final Long courseId)
+	{
+		List<Assignment> assignments = getAssignmentRepository().findAll();
+
+		Set<Assignment> filteredAssignments = assignments.stream()
+				.filter(assignment -> assignment.getCourse().getId().equals(courseId)).collect(Collectors.toSet());
+
+		filteredAssignments.forEach(assignment -> setEnrollments(assignment, enrollmentRepository.findAll()));
+
+		Set<Student> students = new HashSet<>();
+
+		filteredAssignments.forEach(assignment -> assignment.getEnrollments().forEach(enrollment -> students.add(enrollment.getStudent())));
+
+		return new StudentListDTO(students.stream().map(studentMapper::studentToStudentDTO).collect(Collectors.toSet()));
 	}
 
 	@Override

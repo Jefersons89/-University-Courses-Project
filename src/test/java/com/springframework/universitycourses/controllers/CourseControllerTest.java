@@ -61,9 +61,7 @@ class CourseControllerTest
 	{
 		returnedCourseDTOSet = new HashSet<>();
 
-		returnedCourseDTO = new CourseDTO();
-		returnedCourseDTO.setId(ID);
-		returnedCourseDTO.setTitle(TITLE);
+		returnedCourseDTO = CourseDTO.builder().id(ID).title(TITLE).build();
 
 		mockMvc = MockMvcBuilders
 				.standaloneSetup(courseController)
@@ -74,13 +72,9 @@ class CourseControllerTest
 	@Test
 	void getListOfCourses() throws Exception
 	{
-		CourseDTO courseDTO1 = new CourseDTO();
-		courseDTO1.setId(1L);
-		courseDTO1.setTitle("Test1");
+		CourseDTO courseDTO1 = CourseDTO.builder().id(1L).title("Test1").build();
 
-		CourseDTO courseDTO2 = new CourseDTO();
-		courseDTO2.setId(2L);
-		courseDTO2.setTitle("Test2");
+		CourseDTO courseDTO2 = CourseDTO.builder().id(2L).title("Test2").build();
 
 		returnedCourseDTOSet.add(courseDTO1);
 		returnedCourseDTOSet.add(courseDTO2);
@@ -131,11 +125,12 @@ class CourseControllerTest
 	@Test
 	void createNewCourse() throws Exception
 	{
-		CourseDTO courseDTOToCreate = new CourseDTO();
-		courseDTOToCreate.setId(ID);
-		courseDTOToCreate.setTitle(TITLE);
-		courseDTOToCreate.setDescription(DESCRIPTION);
-		courseDTOToCreate.setCredit(CREDIT);
+		CourseDTO courseDTOToCreate =
+				CourseDTO.builder().id(ID)
+						.title(TITLE)
+						.description(DESCRIPTION)
+						.credit(CREDIT)
+						.build();
 
 		when(courseService.createNew(any())).thenReturn(returnedCourseDTO);
 
@@ -156,11 +151,12 @@ class CourseControllerTest
 	@Test
 	void updateCourse() throws Exception
 	{
-		CourseDTO courseDTOToUpdate = new CourseDTO();
-		courseDTOToUpdate.setId(ID);
-		courseDTOToUpdate.setTitle(TITLE);
-		courseDTOToUpdate.setDescription(DESCRIPTION);
-		courseDTOToUpdate.setCredit(CREDIT);
+		CourseDTO courseDTOToUpdate =
+				CourseDTO.builder().id(ID)
+						.title(TITLE)
+						.description(DESCRIPTION)
+						.credit(CREDIT)
+						.build();
 
 		when(courseService.update(anyLong(), any())).thenReturn(returnedCourseDTO);
 
@@ -181,11 +177,12 @@ class CourseControllerTest
 	@Test
 	void updateCourseNotFound() throws Exception
 	{
-		CourseDTO courseDTOToUpdate = new CourseDTO();
-		courseDTOToUpdate.setId(ID);
-		courseDTOToUpdate.setTitle(TITLE);
-		courseDTOToUpdate.setDescription(DESCRIPTION);
-		courseDTOToUpdate.setCredit(CREDIT);
+		CourseDTO courseDTOToUpdate =
+				CourseDTO.builder().id(ID)
+						.title(TITLE)
+						.description(DESCRIPTION)
+						.credit(CREDIT)
+						.build();
 
 		when(courseService.update(anyLong(), any())).thenThrow(NotFoundException.class);
 
@@ -205,9 +202,7 @@ class CourseControllerTest
 	@Test
 	void updateCourseNumberFormatException() throws Exception
 	{
-		CourseDTO courseDTOToUpdate = new CourseDTO();
-		courseDTOToUpdate.setId(ID);
-		courseDTOToUpdate.setTitle(TITLE);
+		CourseDTO courseDTOToUpdate = CourseDTO.builder().id(ID).title(TITLE).build();
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);

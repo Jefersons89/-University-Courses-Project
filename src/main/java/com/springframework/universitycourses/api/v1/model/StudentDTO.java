@@ -1,7 +1,7 @@
 package com.springframework.universitycourses.api.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +16,6 @@ import java.util.Set;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class StudentDTO
 {
 	private Long id;
@@ -43,4 +42,19 @@ public class StudentDTO
 
 	private Set<String> roles;
 	private Set<EnrollmentDTO> enrollments;
+
+	@Builder
+	public StudentDTO(final Long id, final String firstName, final String lastName, final String email, final String password,
+			final Date enrollmentYear,
+			final Set<String> roles, final Set<EnrollmentDTO> enrollments)
+	{
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.password = password;
+		this.enrollmentYear = enrollmentYear;
+		this.roles = roles;
+		this.enrollments = enrollments;
+	}
 }

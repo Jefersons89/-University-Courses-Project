@@ -19,9 +19,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -68,6 +71,21 @@ public class StudentSDJpaService implements StudentService
 	}
 
 	@Override
+	public Student findByModelById(final Long id)
+	{
+		Optional<Student> student = getStudentRepository().findById(id);
+
+		if (student.isEmpty())
+		{
+			throw new NotFoundException("Student Not Found for id: " + id);
+		}
+
+		student.ifPresent(value -> setEnrollments(getEnrollmentRepository().findAll(), value));
+
+		return student.orElse(null);
+	}
+
+	@Override
 	public Set<StudentDTO> findAll()
 	{
 		Pageable sortedByFirstName =
@@ -94,6 +112,56 @@ public class StudentSDJpaService implements StudentService
 		{
 			student.setEnrollments(Collections.emptySet());
 		}
+	}
+
+	@Override
+	public List<Map<String, Object>> getStudentAssignments(final Long id)
+	{
+		Student student = getStudent(id);
+
+		Set<Assignment> assignments =
+				student.getEnrollments().stream()
+						.map(Enrollment::getAssignment)
+						.collect(Collectors.toSet());
+
+		return getMapList(student, assignments);
+	}
+
+	private static List<Map<String, Object>> getMapList(final Student student, final Set<Assignment> assignments)
+	{
+		List<Map<String, Object>> assignmentsList = new ArrayList<>();
+
+		assignments.forEach(assignment -> {
+			Optional<Enrollment> enrollment = student.getEnrollments().stream()
+					.filter(e -> e.getId().getAssignmentId().equals(assignment.getId()))
+					.findFirst();
+
+			Map<String, Object> object = new HashMap<>();
+			object.put("AssignmentId", assignment.getId());
+			object.put("AssignmentTitle", assignment.getTitle());
+
+			enrollment.ifPresent(e -> {
+				object.put("InProgress", e.getInProgress());
+				if (e.getInProgress().equals(false))
+				{
+					object.put("grade", e.getGrade());
+				}
+			});
+
+			assignmentsList.add(object);
+		});
+		return assignmentsList;
+	}
+
+	private Student getStudent(final Long id)
+	{
+		Student student = this.findByModelById(id);
+
+		if (student.getEnrollments().isEmpty())
+		{
+			throw new NotFoundException("Not enrollments found for student with id: " + id);
+		}
+		return student;
 	}
 
 	@Override
